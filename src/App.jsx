@@ -111,7 +111,7 @@ const projects = [
     stack: "Carbon Footprint Platform",
     type: "CarbonFootprint (Public)",
     text: "EcoTrack is a smart carbon footprint management platform designed to help individuals and organizations measure, analyze, and reduce environmental impact using real-world data and verified emission factors.",
-    liveHref: "https://omshri-23.github.io/CarbonFootprint/",
+    liveHref: "https://github.com/omshri-23/CarbonFootprint",
     repoHref: "https://github.com/omshri-23/CarbonFootprint",
   },
 ];
@@ -121,22 +121,19 @@ const education = [
     year: "2023 - 2026",
     title: "Bachelor of Computer Application",
     place: "Jaysingpur College, Jaysingpur",
-    score: "8.67",
-    label: "CGPA",
+    detail: "Focus: computer applications, software development, and databases.",
   },
   {
     year: "2021 - 2023",
     title: "Higher Secondary - PCM + Computer Science",
     place: "Sharad Institute of Technology Jr. College, Kolhapur",
-    score: "79%",
-    label: "Percentage",
+    detail: "Stream: PCM + Computer Science.",
   },
   {
     year: "2021",
     title: "Secondary School Certificate",
     place: "Alphonsa School, Yadrav, Kolhapur",
-    score: "88%",
-    label: "Percentage",
+    detail: "Foundation: mathematics, science, and communication.",
   },
 ];
 
@@ -197,12 +194,17 @@ const certifications = [
   {
     title: "Adobe Photoshop",
     meta: "Certified - 2024",
-    text: "Photo editing, design workflow, and visual composition fundamentals.",
+    text: "Retouching, compositing, color control, and export-ready asset workflows.",
   },
   {
-    title: "Tally and Advanced Excel",
-    meta: "Certified - 2024",
-    text: "Practical spreadsheet, reporting, and business data handling skills.",
+    title: "Canva Design",
+    meta: "Design Tools",
+    text: "Brand kits, social creatives, quick layout iterations, and clean presentation assets.",
+  },
+  {
+    title: "UI/UX Design",
+    meta: "Design Practice",
+    text: "Hierarchy, spacing systems, typography, and user-first interface thinking.",
   },
   {
     title: "Database Management",
@@ -220,6 +222,20 @@ const certifications = [
     text: "System fundamentals, process awareness, and platform-level understanding.",
   },
 ];
+
+function projectMonogram(title) {
+  const parts = String(title)
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  const word = parts[0] ?? "";
+  return word.slice(0, 2).toUpperCase();
+}
 
 function TiltCard({ className = "", children }) {
   const onMove = (event) => {
@@ -264,6 +280,32 @@ function MagneticLink({ className = "", href, children, ...props }) {
     <a href={href} className={className} onMouseMove={onMove} onMouseLeave={onLeave} {...props}>
       {children}
     </a>
+  );
+}
+
+function BootLoader({ done }) {
+  return (
+    <div
+      className={`boot-loader${done ? " boot-loader--done" : ""}`}
+      role="status"
+      aria-live="polite"
+      aria-label="Loading portfolio"
+      aria-hidden={done}
+    >
+      <TiltCard className="boot-loader__card">
+        <div className="boot-loader__logo" aria-hidden="true">
+          23
+        </div>
+        <div className="boot-loader__row">
+          <p className="boot-loader__label">Loading portfolio</p>
+          <div className="boot-loader__dots" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+      </TiltCard>
+    </div>
   );
 }
 
@@ -405,6 +447,14 @@ function App() {
   );
   const [activeSection, setActiveSection] = useState("hero");
   const [heroBadge, setHeroBadge] = useState("BCA Student - Developer - Kolhapur, MH");
+  const [bootDone, setBootDone] = useState(false);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const delay = prefersReducedMotion ? 0 : 900;
+    const timer = window.setTimeout(() => setBootDone(true), delay);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     document.documentElement.style.background = "#07070d";
@@ -479,66 +529,70 @@ function App() {
   const currentIndex = Math.max(1, sections.indexOf(activeSection) + 1);
 
   return (
-    <div className="page-shell">
-      <div className="ambient ambient-one" />
-      <div className="ambient ambient-two" />
-      <div className="grain" />
+    <>
+      <BootLoader done={bootDone} />
+      <div className="page-shell">
+        <div className="ambient ambient-one" />
+        <div className="ambient ambient-two" />
+        <div className="grain" />
 
-      <div className="section-counter" aria-hidden="true">
-        <span className="section-counter__num">{String(currentIndex).padStart(2, "0")}</span>
-        <span className="section-counter__line" />
-        <span className="section-counter__total">/ {String(sections.length).padStart(2, "0")}</span>
-      </div>
-
-      <header className="site-nav">
-        <div className="site-nav__inner">
-          <a href="#hero" className="site-logo">
-            23
-          </a>
-          <nav className="site-links">
-            {navigation.map((item) => (
-              <a key={item.id} href={`#${item.id}`}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <a href="#contact" className="site-pill">
-            Open to Work
-          </a>
+        <div className="section-counter" aria-hidden="true">
+          <span className="section-counter__num">{String(currentIndex).padStart(2, "0")}</span>
+          <span className="section-counter__line" />
+          <span className="section-counter__total">
+            / {String(sections.length).padStart(2, "0")}
+          </span>
         </div>
-      </header>
 
-      <main>
-        <section className="hero-section" id="hero">
-          <div className="container hero-grid">
-            <div className="hero-copy">
-              <p className="hero-badge reveal">{heroBadge}</p>
-              <h1 className="hero-title reveal reveal-delay-1">
-                Omshri <span>Singh</span>
-              </h1>
-              <div className="hero-role-row reveal reveal-delay-2">
-                <span>Full Stack Dev</span>
-                <span>Photography-Tech</span>
-                <span>Digital Strategy</span>
-                <span>Creator</span>
-              </div>
-              <p className="hero-text reveal reveal-delay-2">
-                Motivated and self-driven Bachelor of Computer Applications student with 11 months of
-                professional experience in digital marketing and strong hands-on development work
-                across HTML, CSS, JavaScript, ASP.NET, C#, and SQL Server.
-              </p>
-              <div className="hero-actions reveal reveal-delay-3">
-                <MagneticLink href="#projects" className="button button-primary">
-                  View Projects
-                </MagneticLink>
-                <MagneticLink href="#contact" className="button button-secondary">
-                  Contact Me
-                </MagneticLink>
-              </div>
-            </div>
+        <header className="site-nav">
+          <div className="site-nav__inner">
+            <a href="#hero" className="site-logo">
+              23
+            </a>
+            <nav className="site-links">
+              {navigation.map((item) => (
+                <a key={item.id} href={`#${item.id}`}>
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+            <a href="#contact" className="site-pill">
+              Open to Work
+            </a>
+          </div>
+        </header>
 
-            <div className="hero-stage reveal reveal-delay-2">
-              <div className="hero-ring hero-ring--one" />
+        <main>
+          <section className="hero-section" id="hero">
+            <div className="container hero-grid">
+              <div className="hero-copy">
+                <p className="hero-badge reveal">{heroBadge}</p>
+                <h1 className="hero-title reveal reveal-delay-1">
+                  Omshri <span>Singh</span>
+                </h1>
+                <div className="hero-role-row reveal reveal-delay-2">
+                  <span>Full Stack Dev</span>
+                  <span>Photography-Tech</span>
+                  <span>Digital Strategy</span>
+                  <span>Creator</span>
+                </div>
+                <p className="hero-text reveal reveal-delay-2">
+                  Motivated and self-driven Bachelor of Computer Applications student with 11 months
+                  of professional experience in digital marketing and strong hands-on development
+                  work across HTML, CSS, JavaScript, ASP.NET, C#, and SQL Server.
+                </p>
+                <div className="hero-actions reveal reveal-delay-3">
+                  <MagneticLink href="#projects" className="button button-primary">
+                    View Projects
+                  </MagneticLink>
+                  <MagneticLink href="#contact" className="button button-secondary">
+                    Contact Me
+                  </MagneticLink>
+                </div>
+              </div>
+
+              <div className="hero-stage reveal reveal-delay-2">
+                <div className="hero-ring hero-ring--one" />
               <div className="hero-ring hero-ring--two" />
               <div className="hero-ring hero-ring--three" />
               <div className="hero-orb" />
@@ -736,6 +790,12 @@ function App() {
                 <TiltCard key={project.title} className={`project-card reveal reveal-delay-${index + 2}`}>
                   <div className="project-card__inner">
                     <div className="project-visual">
+                      <div className="project-mark" aria-hidden="true">
+                        <span className="project-mark__icon">
+                          <InlineIcon name="spark" className="project-mark__svg" />
+                        </span>
+                        <span className="project-mark__abbr">{projectMonogram(project.title)}</span>
+                      </div>
                       <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
                       <div className="project-glow" />
                     </div>
@@ -827,10 +887,7 @@ function App() {
                   <p className="education-year">{item.year}</p>
                   <h3>{item.title}</h3>
                   <p className="education-place">{item.place}</p>
-                  <div className="education-score">
-                    <strong>{item.score}</strong>
-                    <span>{item.label}</span>
-                  </div>
+                  {item.detail ? <p className="education-detail">{item.detail}</p> : null}
                 </TiltCard>
               ))}
 
@@ -947,6 +1004,7 @@ function App() {
         </section>
       </main>
     </div>
+    </>
   );
 }
 
