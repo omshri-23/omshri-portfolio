@@ -1,13 +1,13 @@
-# Omshri Portfolio 2026
+# Omshri Portfolio
 
-A personal portfolio site for Omshri Singh that brings together development work, photography, writing, and contact links in one place.
+A refined React and Vite portfolio for Omshri Singh, combining software work, photography, writing, and contact details in a single site.
 
 ## Highlights
 
-- Bold single-page portfolio layout
-- Project, photography, blog, and achievement sections
-- Built-in admin editing with local storage persistence
-- Personal branding across developer and creator work
+- Cleaner section structure and stronger visual hierarchy
+- Responsive portfolio layout for desktop and mobile
+- Built-in content editor backed by local storage
+- Theme toggle, photo filtering, and lightweight modal preview
 
 ## Stack
 
@@ -18,10 +18,10 @@ A personal portfolio site for Omshri Singh that brings together development work
 ## Local setup
 
 1. Run `npm install`
-2. Start the site with `npm run dev`
-3. Build production assets with `npm run build`
+2. Start the app with `npm run dev`
+3. Build for production with `npm run build`
 
 ## Notes
 
-- Current content is stored in browser local storage for demo-style editing
-- This repo should be renamed on GitHub to something stronger like `portfolio-2026` or `omshri-portfolio`
+- Portfolio content is saved in browser local storage
+- The inline editor uses the default password `admin123` until you change it

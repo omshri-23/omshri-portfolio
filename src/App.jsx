@@ -1,1202 +1,703 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
-const STORAGE_KEY = "portlio23-portfolio-data-v2";
-const PASSWORD_KEY = "portlio23-admin-password-v2";
-
-const navItems = [
-  ["home", "Home"],
-  ["about", "About"],
-  ["skills", "Skills"],
-  ["projects", "Projects"],
-  ["photography", "Photography"],
-  ["blog", "Blog"],
-  ["contact", "Contact"],
+const navigation = [
+  { id: "about", label: "About" },
+  { id: "experience", label: "Experience" },
+  { id: "projects", label: "Projects" },
+  { id: "journey", label: "Journey" },
+  { id: "milestones", label: "Wins" },
+  { id: "contact", label: "Contact" },
 ];
 
-const defaultPortfolioData = {
-  hero: {
-    label: "Portfolio 2026",
-    firstName: "Omshri",
-    lastName: "Singh",
-    roles: "Developer . Photographer . Creator . Storyteller",
-    intro:
-      "Building technology, capturing moments, and telling stories. I work at the intersection of code and creativity to turn ideas into digital experiences.",
-    primaryLabel: "View My Work",
-    primaryHref: "#projects",
-    secondaryLabel: "Contact Me",
-    secondaryHref: "#contact",
-    photoMonogram: "OM",
-    photoCaption: "Developer Photographer Creator",
-    statOneValue: "3+",
-    statOneLabel: "Projects built",
-    statTwoValue: "∞",
-    statTwoLabel: "Frames captured",
+const heroStats = [
+  { value: "4+", label: "Years Coding" },
+  { value: "8.67", label: "BCA CGPA" },
+  { value: "11M", label: "Pro Experience" },
+  { value: "1K+", label: "Photos Shot" },
+];
+
+const experience = [
+  {
+    company: "Textile Daddy",
+    role: "Social Media Manager and Digital Marketing Executive",
+    period: "Jan 2025 - Nov 2025",
+    points: [
+      "Managed brand presence across LinkedIn and Facebook for a B2B textile portal.",
+      "Designed creatives, banners, and promotional content with consistent brand identity.",
+      "Improved reach, engagement, and lead generation through structured campaign planning.",
+    ],
+    tags: ["Social Media", "Branding", "Campaigns", "B2B"],
   },
-  about: {
-    label: "About Me",
-    title: "Developer by logic,",
-    accent: "artist by soul.",
-    tagline: "I build things that matter and capture moments that last.",
-    paragraphOne:
-      "I'm Omshri Singh, a BCA student with a strong interest in software development, product building, and mobile photography.",
-    paragraphTwo:
-      "When I'm not writing code, I'm chasing golden hour, crafting stories, working on visual edits, or building ideas around A Book Of My Story - 23.",
-    imageText: "OMSHRI",
-    interests: [
-      "Mobile Photography",
-      "Software Dev",
-      "Story Writing",
-      "Filmmaking",
-      "Sports",
-      "Color Grading",
-      "BCA Student",
-      "Creator",
+  {
+    company: "Textile Voice",
+    role: "Software Development and Digital Strategy Contributor",
+    period: "Jan 2025 - Nov 2025",
+    points: [
+      "Contributed to feature planning and responsive UI improvements.",
+      "Managed content updates including news, listings, and digital consistency.",
+      "Worked between marketing and development priorities to support execution.",
+    ],
+    tags: ["UI", "Content", "Strategy", "Coordination"],
+  },
+];
+
+const skillGroups = [
+  {
+    title: "Development",
+    items: [
+      ["HTML and CSS", 95],
+      ["JavaScript", 80],
+      ["ASP.NET and C#", 74],
+      ["SQL Server", 78],
+      ["React", 62],
     ],
   },
-  skills: [
-    {
-      title: "Programming",
-      items: [
-        { name: "HTML / CSS", value: 95 },
-        { name: "JavaScript", value: 80 },
-        { name: "React", value: 72 },
-        { name: "Python", value: 68 },
-        { name: "Node.js", value: 60 },
-      ],
-    },
-    {
-      title: "Design and Editing",
-      items: [
-        { name: "Lightroom", value: 92 },
-        { name: "Photoshop", value: 78 },
-        { name: "Color Grading", value: 88 },
-        { name: "UI Design", value: 65 },
-      ],
-    },
-    {
-      title: "Creative Arts",
-      items: [
-        { name: "Photography", value: 90 },
-        { name: "Story Writing", value: 85 },
-        { name: "Filmmaking", value: 70 },
-        { name: "Composition", value: 88 },
-      ],
-    },
-  ],
-  projects: [
-    {
-      title: "Photic Photo Portfolio",
-      tech: "React, CSS, Lightroom",
-      desc:
-        "A photography-first portfolio platform with a lightbox viewer, category filtering, and a polished showcase layout.",
-      accent: "PH",
-      href: "https://github.com/omshri-23",
-      linkLabel: "View GitHub Profile",
-    },
-    {
-      title: "LensCraft Platform",
-      tech: "React, Node.js, PostgreSQL",
-      desc:
-        "A B2B marketplace connecting photographers with clients through bookings, galleries, messaging, and dashboards.",
-      accent: "LC",
-      href: "https://github.com/omshri-23",
-      linkLabel: "Explore Work",
-    },
-    {
-      title: "Story Archive",
-      tech: "HTML, CSS, JavaScript",
-      desc:
-        "A personal writing archive for poetry, short stories, and essays with a minimal reading-first design.",
-      accent: "ST",
-      href: "https://github.com/omshri-23",
-      linkLabel: "See More Writing",
-    },
-  ],
-  photos: [
-    { category: "nature", title: "Golden Hour Forest", label: "Nature Shot", monogram: "NT" },
-    { category: "street", title: "Urban Geometry", label: "Street Shot", monogram: "ST" },
-    { category: "portrait", title: "Natural Light Study", label: "Portrait Shot", monogram: "PR" },
-    { category: "edit", title: "Cinematic Grade", label: "Creative Edit", monogram: "ED" },
-    { category: "nature", title: "Sunrise Over Horizon", label: "Nature Shot", monogram: "SN" },
-    { category: "street", title: "Rainy Evening Walk", label: "Street Shot", monogram: "RW" },
-  ],
-  achievements: [
-    { title: "Sports Champion", desc: "District-level sports achievements and strong team participation across multiple disciplines." },
-    { title: "BCA Scholar", desc: "Pursuing Bachelor of Computer Applications with a strong academic and technical focus." },
-    { title: "Published Author", desc: "Author of A Book Of My Story - 23, a personal narrative of life, emotion, and discovery." },
-    { title: "Certifications", desc: "Certified in web development, photography editing, and design fundamentals." },
-  ],
-  blogs: [
-    { type: "Book Excerpt", title: "A Book Of My Story - 23", excerpt: "A personal collection of stories, reflections, and poetry about growth, failure, and creating.", badge: "BK" },
-    { type: "Photography Essay", title: "Why I Shoot with My Phone", excerpt: "How mobile photography changed the way I see the world and why creative constraints make work stronger.", badge: "MP" },
-    { type: "Thoughts", title: "Building at the Intersection", excerpt: "On living between the worlds of logic and art and why that tension is the most interesting place to create from.", badge: "IN" },
-  ],
-  socials: [
-    { label: "Email 1", href: "mailto:omshri.2311@gmail.com" },
-    { label: "Email 2", href: "mailto:omshrisingh93056@gmail.com" },
-    { label: "Instagram", href: "https://www.instagram.com/photic.photo" },
-    { label: "LinkedIn", href: "https://www.linkedin.com/in/omshri23" },
-    { label: "GitHub", href: "https://github.com/omshri-23" },
-    { label: "YouTube", href: "https://www.youtube.com/@PHOTIC_PHOTO" },
-    { label: "Phone", href: "tel:+917387517570" },
-  ],
-  contact: {
-    label: "Contact",
-    title: "Let's create something.",
-    subtitle:
-      "Open for collaborations, projects, internships, freelance work, and conversations. Based in Kolhapur, Maharashtra, India. Reach me at +91 7387517570.",
-    formMessage: "Message saved for portfolio demo. Connect Formspree or your backend to make it live.",
+  {
+    title: "Creative",
+    items: [
+      ["Photography", 90],
+      ["Adobe Lightroom", 92],
+      ["Photoshop", 78],
+      ["Social Media", 88],
+      ["Content Design", 84],
+    ],
   },
-  footer: {
-    left: "2026 Omshri Singh . Developer . Photographer . Creator",
-    right: "Designed and built with care.",
-  },
-};
-
-const adminTabs = [
-  ["hero", "Hero"],
-  ["about", "About"],
-  ["skills", "Skills"],
-  ["projects", "Projects"],
-  ["photos", "Photos"],
-  ["achievements", "Achievements"],
-  ["blogs", "Blogs"],
-  ["socials", "Socials"],
-  ["settings", "Settings"],
 ];
 
-function loadPortfolioData() {
-  if (typeof window === "undefined") {
-    return defaultPortfolioData;
-  }
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      return defaultPortfolioData;
-    }
+const projects = [
+  {
+    title: "LensCraft",
+    stack: "React - PostgreSQL - Startup Build",
+    type: "Photography Startup Platform",
+    text: "Originally started as an ASP.NET college project, now being rebuilt as a full startup-focused platform for photographers with stronger product direction, modern frontend architecture, and scalable backend planning.",
+    href: "https://github.com/omshri-23",
+  },
+  {
+    title: "Photic Photography",
+    stack: "React - Vite - Frontend Experience",
+    type: "Live Photography Portfolio",
+    text: "Live photography portfolio built in React and Vite with a cleaner presentation layer, modern frontend structure, and a visual-first browsing experience.",
+    href: "https://photic-photography.vercel.app/",
+  },
+  {
+    title: "Top Byte",
+    stack: "HTML - CSS - JavaScript",
+    type: "E-commerce Frontend",
+    text: "Responsive online computer store interface with product discovery, filtering, and cart-oriented UI behavior.",
+    href: "https://github.com/omshri-23",
+  },
+  {
+    title: "Style Sphere",
+    stack: "Frontend Concept - UI System",
+    type: "Fashion Commerce Interface",
+    text: "A visual-first fashion storefront concept focused on bold layout, cleaner browsing flow, and modern product presentation.",
+    href: "https://github.com/omshri-23/Style-Sphere",
+  },
+];
 
-    const parsed = JSON.parse(stored);
-    return normalizePortfolioData(parsed);
-  } catch {
-    window.localStorage.removeItem(STORAGE_KEY);
-    return defaultPortfolioData;
-  }
-}
+const education = [
+  {
+    year: "2023 - 2026",
+    title: "Bachelor of Computer Application",
+    place: "Jaysingpur College, Jaysingpur",
+    score: "8.67",
+    label: "CGPA",
+  },
+  {
+    year: "2021 - 2023",
+    title: "Higher Secondary - PCM + Computer Science",
+    place: "Sharad Institute of Technology Jr. College, Kolhapur",
+    score: "79%",
+    label: "Percentage",
+  },
+  {
+    year: "2021",
+    title: "Secondary School Certificate",
+    place: "Alphonsa School, Yadrav, Kolhapur",
+    score: "88%",
+    label: "Percentage",
+  },
+];
 
-function normalizePortfolioData(parsed) {
-  const safe = parsed && typeof parsed === "object" ? parsed : {};
+const milestones = [
+  {
+    title: "Sports Champion",
+    text: "District-level sports achievements. Consistent team player and competitor across multiple disciplines.",
+  },
+  {
+    title: "BCA Scholar",
+    text: "Pursuing Bachelor of Computer Applications with strong academics and deep technical focus.",
+  },
+  {
+    title: "Creative Discipline",
+    text: "Strong consistency across photography, design execution, digital presentation, and personal creative work.",
+  },
+  {
+    title: "Certifications",
+    text: "Certified in web development, photography editing, and design fundamentals across practical learning tracks.",
+  },
+];
 
-  const normalized = {
-    hero: { ...defaultPortfolioData.hero, ...(safe.hero || {}) },
-    about: {
-      ...defaultPortfolioData.about,
-      ...(safe.about || {}),
-      interests: Array.isArray(safe.about?.interests)
-        ? safe.about.interests.map((item) => String(item))
-        : defaultPortfolioData.about.interests,
-    },
-    skills: Array.isArray(safe.skills)
-      ? safe.skills.map((group, groupIndex) => ({
-          title: String(group?.title || `Skill Group ${groupIndex + 1}`),
-          items: Array.isArray(group?.items)
-            ? group.items.map((item, itemIndex) => ({
-                name: String(item?.name || `Skill ${itemIndex + 1}`),
-                value: Number(item?.value ?? 50) || 0,
-              }))
-            : defaultPortfolioData.skills[Math.min(groupIndex, defaultPortfolioData.skills.length - 1)].items,
-        }))
-      : defaultPortfolioData.skills,
-    projects: Array.isArray(safe.projects)
-      ? safe.projects.map((item, index) => ({
-          title: String(item?.title || `Project ${index + 1}`),
-          tech: typeof item?.tech === "string" ? item.tech : "React, CSS",
-          desc: String(item?.desc || "Project description"),
-          accent: String(item?.accent || "PR"),
-          href: String(item?.href || "https://github.com/omshri-23"),
-          linkLabel: String(item?.linkLabel || "Open Project"),
-        }))
-      : defaultPortfolioData.projects,
-    photos: Array.isArray(safe.photos)
-      ? safe.photos.map((item, index) =>
-          Array.isArray(item)
-            ? {
-                category: String(item[0] || "nature"),
-                title: String(item[1] || `Photo ${index + 1}`),
-                label: String(item[2] || "Photo Label"),
-                monogram: "PH",
-              }
-            : {
-                category: String(item?.category || "nature"),
-                title: String(item?.title || `Photo ${index + 1}`),
-                label: String(item?.label || "Photo Label"),
-                monogram: String(item?.monogram || "PH"),
-              },
-        )
-      : defaultPortfolioData.photos,
-    achievements: Array.isArray(safe.achievements)
-      ? safe.achievements.map((item, index) =>
-          Array.isArray(item)
-            ? { title: String(item[0] || `Achievement ${index + 1}`), desc: String(item[1] || "") }
-            : { title: String(item?.title || `Achievement ${index + 1}`), desc: String(item?.desc || "") },
-        )
-      : defaultPortfolioData.achievements,
-    blogs: Array.isArray(safe.blogs)
-      ? safe.blogs.map((item, index) =>
-          Array.isArray(item)
-            ? {
-                type: String(item[0] || "Article"),
-                title: String(item[1] || `Blog ${index + 1}`),
-                excerpt: String(item[2] || ""),
-                badge: String(item[3] || "BL"),
-              }
-            : {
-                type: String(item?.type || "Article"),
-                title: String(item?.title || `Blog ${index + 1}`),
-                excerpt: String(item?.excerpt || ""),
-                badge: String(item?.badge || "BL"),
-              },
-        )
-      : defaultPortfolioData.blogs,
-    socials: Array.isArray(safe.socials)
-      ? safe.socials.map((item, index) =>
-          Array.isArray(item)
-            ? { label: String(item[0] || `Link ${index + 1}`), href: String(item[1] || "#") }
-            : { label: String(item?.label || `Link ${index + 1}`), href: String(item?.href || "#") },
-        )
-      : defaultPortfolioData.socials,
-    contact: { ...defaultPortfolioData.contact, ...(safe.contact || {}) },
-    footer: { ...defaultPortfolioData.footer, ...(safe.footer || {}) },
+const journey = [
+  [
+    "March 2021",
+    "Started at Alphonsa School - 88% SSC",
+    "Completed secondary school with 88% and wrote the first lines of HTML. The beginning of everything.",
+  ],
+  [
+    "2021 - 2023",
+    "College PCM Computer Science - HSC (79%)",
+    "Completed HSC with PCM and Computer Science at Sharad Institute of Technology.",
+  ],
+  ["June 2023", "Creative Growth", "Began building a stronger creative identity across design, photography, and visual storytelling."],
+  [
+    "2023 - Present",
+    "BCA - Jaysingpur College - CGPA 8.67",
+    "Enrolled in Bachelor of Computer Application, deepened full-stack skills, and built projects like LensCraft, Photic Photography, Top Byte, and Style Sphere.",
+  ],
+  [
+    "Jan - Nov 2025",
+    "Social Media Manager - Textile Daddy",
+    "Built real professional experience by growing a B2B textile portal's social presence, running campaigns, and building content systems.",
+  ],
+  [
+    "Textile Voice",
+    "Contributor",
+    "Jan - Nov 2025 - Contributed to software development and digital strategy at Textile Voice while working across the same parent company ecosystem.",
+  ],
+  [
+    "Now",
+    "Open to Work - Building LensCraft Startup",
+    "Open to internships, collaborations, and opportunities while moving LensCraft toward a serious startup product.",
+  ],
+];
+
+const certifications = [
+  {
+    title: "Adobe Photoshop",
+    meta: "Certified - 2024",
+    text: "Photo editing, design workflow, and visual composition fundamentals.",
+  },
+  {
+    title: "Tally and Advanced Excel",
+    meta: "Certified - 2024",
+    text: "Practical spreadsheet, reporting, and business data handling skills.",
+  },
+  {
+    title: "Database Management",
+    meta: "Core Knowledge",
+    text: "Structured data thinking, schemas, relationships, and query logic.",
+  },
+  {
+    title: "Networking Basics",
+    meta: "Core Knowledge",
+    text: "System connectivity, communication fundamentals, and network concepts.",
+  },
+  {
+    title: "Operating Systems",
+    meta: "Core Knowledge",
+    text: "System fundamentals, process awareness, and platform-level understanding.",
+  },
+];
+
+function TiltCard({ className = "", children }) {
+  const onMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    event.currentTarget.style.transform = `perspective(1000px) rotateX(${(-py * 8).toFixed(2)}deg) rotateY(${(px * 10).toFixed(2)}deg) translateY(-6px)`;
   };
 
-  if (
-    !normalized.hero.firstName ||
-    !normalized.about.interests.length ||
-    !Array.isArray(normalized.skills) ||
-    !Array.isArray(normalized.projects) ||
-    !Array.isArray(normalized.photos)
-  ) {
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(STORAGE_KEY);
-    }
-    return defaultPortfolioData;
-  }
+  const onLeave = (event) => {
+    event.currentTarget.style.transform = "";
+  };
 
-  return normalized;
-}
-
-function loadPassword() {
-  if (typeof window === "undefined") {
-    return "admin123";
-  }
-  return window.localStorage.getItem(PASSWORD_KEY) || "admin123";
-}
-
-function capitalize(value) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function HoverLink({ children, href, onEnter, onLeave, variant }) {
   return (
-    <a className={variant === "primary" ? "btn-primary" : "btn-outline"} href={href} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+    <div className={className} onMouseMove={onMove} onMouseLeave={onLeave}>
+      {children}
+    </div>
+  );
+}
+
+function MagneticLink({ className = "", href, children, ...props }) {
+  const onMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - rect.left - rect.width / 2) * 0.18;
+    const y = (event.clientY - rect.top - rect.height / 2) * 0.24;
+    event.currentTarget.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+  };
+
+  const onLeave = (event) => {
+    event.currentTarget.style.transform = "";
+  };
+
+  return (
+    <a href={href} className={className} onMouseMove={onMove} onMouseLeave={onLeave} {...props}>
       {children}
     </a>
   );
 }
 
-function AdminField({ label, onChange, value }) {
-  return (
-    <label className="admin-field">
-      <span>{label}</span>
-      <input onChange={(event) => onChange(event.target.value)} value={value} />
-    </label>
-  );
-}
-
-function AdminTextArea({ label, onChange, value }) {
-  return (
-    <label className="admin-field">
-      <span>{label}</span>
-      <textarea onChange={(event) => onChange(event.target.value)} rows="4" value={value} />
-    </label>
-  );
-}
-
-function ArrayEditor({ addItem, fields, items, onChange, onRemove }) {
-  return (
-    <div className="admin-section">
-      {items.map((item, index) => (
-        <div className="admin-card" key={`${fields[0][0]}-${index}`}>
-          {fields.map(([field, label, multiline]) =>
-            multiline ? (
-              <AdminTextArea key={field} label={label} onChange={(value) => onChange(index, field, value)} value={item[field]} />
-            ) : (
-              <AdminField key={field} label={label} onChange={(value) => onChange(index, field, value)} value={item[field]} />
-            ),
-          )}
-          <button className="admin-danger" onClick={() => onRemove(index)} type="button">
-            Remove
-          </button>
-        </div>
-      ))}
-      <button className="admin-add" onClick={addItem} type="button">
-        Add Item
-      </button>
-    </div>
-  );
-}
-
-function AdminPanel({
-  activeAdminTab,
-  adminDraftPassword,
-  adminLoggedIn,
-  adminOpen,
-  loginError,
-  loginInput,
-  onAddArrayItem,
-  onAddInterest,
-  onAddSkillGroup,
-  onAddSkillItem,
-  onAdminDraftPasswordChange,
-  onArrayItemChange,
-  onChangeTab,
-  onInterestChange,
-  onLogin,
-  onLoginInputChange,
-  onRemoveArrayItem,
-  onRemoveInterest,
-  onRemoveSkillGroup,
-  onRemoveSkillItem,
-  onResetPortfolio,
-  onSavePassword,
-  onSectionChange,
-  onSkillGroupChange,
-  onSkillItemChange,
-  portfolio,
-  saveMessage,
-}) {
-  if (!adminOpen) {
-    return null;
-  }
-
-  return (
-    <aside className="admin-panel">
-      <div className="admin-panel-head">
-        <div>
-          <div className="admin-eyebrow">Portlio Admin</div>
-          <h3>Manage Portfolio Content</h3>
-        </div>
-        {saveMessage ? <span className="admin-save-badge">{saveMessage}</span> : null}
-      </div>
-
-      {!adminLoggedIn ? (
-        <div className="admin-login">
-          <label htmlFor="admin-password">Admin password</label>
-          <input id="admin-password" onChange={(event) => onLoginInputChange(event.target.value)} placeholder="Enter password" type="password" value={loginInput} />
-          <button className="btn-primary admin-btn" onClick={onLogin} type="button">
-            Login
-          </button>
-          <p className="admin-note">Default password: `admin123`</p>
-          {loginError ? <p className="admin-error">{loginError}</p> : null}
-        </div>
-      ) : (
-        <>
-          <div className="admin-tabs">
-            {adminTabs.map(([value, label]) => (
-              <button className={`admin-tab ${activeAdminTab === value ? "active" : ""}`} key={value} onClick={() => onChangeTab(value)} type="button">
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <div className="admin-body">
-            {activeAdminTab === "hero" ? (
-              <div className="admin-section">
-                <AdminField label="Hero label" onChange={(value) => onSectionChange("hero", "label", value)} value={portfolio.hero.label} />
-                <AdminField label="First name" onChange={(value) => onSectionChange("hero", "firstName", value)} value={portfolio.hero.firstName} />
-                <AdminField label="Last name" onChange={(value) => onSectionChange("hero", "lastName", value)} value={portfolio.hero.lastName} />
-                <AdminField label="Roles line" onChange={(value) => onSectionChange("hero", "roles", value)} value={portfolio.hero.roles} />
-                <AdminTextArea label="Intro" onChange={(value) => onSectionChange("hero", "intro", value)} value={portfolio.hero.intro} />
-                <AdminField label="Primary button label" onChange={(value) => onSectionChange("hero", "primaryLabel", value)} value={portfolio.hero.primaryLabel} />
-                <AdminField label="Primary button href" onChange={(value) => onSectionChange("hero", "primaryHref", value)} value={portfolio.hero.primaryHref} />
-                <AdminField label="Secondary button label" onChange={(value) => onSectionChange("hero", "secondaryLabel", value)} value={portfolio.hero.secondaryLabel} />
-                <AdminField label="Secondary button href" onChange={(value) => onSectionChange("hero", "secondaryHref", value)} value={portfolio.hero.secondaryHref} />
-                <AdminField label="Hero monogram" onChange={(value) => onSectionChange("hero", "photoMonogram", value)} value={portfolio.hero.photoMonogram} />
-                <AdminField label="Hero caption" onChange={(value) => onSectionChange("hero", "photoCaption", value)} value={portfolio.hero.photoCaption} />
-                <AdminField label="Stat one value" onChange={(value) => onSectionChange("hero", "statOneValue", value)} value={portfolio.hero.statOneValue} />
-                <AdminField label="Stat one label" onChange={(value) => onSectionChange("hero", "statOneLabel", value)} value={portfolio.hero.statOneLabel} />
-                <AdminField label="Stat two value" onChange={(value) => onSectionChange("hero", "statTwoValue", value)} value={portfolio.hero.statTwoValue} />
-                <AdminField label="Stat two label" onChange={(value) => onSectionChange("hero", "statTwoLabel", value)} value={portfolio.hero.statTwoLabel} />
-              </div>
-            ) : null}
-
-            {activeAdminTab === "about" ? (
-              <div className="admin-section">
-                <AdminField label="Section label" onChange={(value) => onSectionChange("about", "label", value)} value={portfolio.about.label} />
-                <AdminField label="Title line" onChange={(value) => onSectionChange("about", "title", value)} value={portfolio.about.title} />
-                <AdminField label="Accent line" onChange={(value) => onSectionChange("about", "accent", value)} value={portfolio.about.accent} />
-                <AdminField label="Tagline" onChange={(value) => onSectionChange("about", "tagline", value)} value={portfolio.about.tagline} />
-                <AdminTextArea label="Paragraph one" onChange={(value) => onSectionChange("about", "paragraphOne", value)} value={portfolio.about.paragraphOne} />
-                <AdminTextArea label="Paragraph two" onChange={(value) => onSectionChange("about", "paragraphTwo", value)} value={portfolio.about.paragraphTwo} />
-                <AdminField label="Image text" onChange={(value) => onSectionChange("about", "imageText", value)} value={portfolio.about.imageText} />
-                <div className="admin-subhead">Interests</div>
-                {portfolio.about.interests.map((interest, index) => (
-                  <div className="admin-inline" key={`${interest}-${index}`}>
-                    <input onChange={(event) => onInterestChange(index, event.target.value)} value={interest} />
-                    <button className="admin-danger" onClick={() => onRemoveInterest(index)} type="button">
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button className="admin-add" onClick={onAddInterest} type="button">
-                  Add Interest
-                </button>
-              </div>
-            ) : null}
-
-            {activeAdminTab === "skills" ? (
-              <div className="admin-section">
-                {portfolio.skills.map((group, groupIndex) => (
-                  <div className="admin-card" key={`${group.title}-${groupIndex}`}>
-                    <div className="admin-inline admin-space">
-                      <input onChange={(event) => onSkillGroupChange(groupIndex, "title", event.target.value)} value={group.title} />
-                      <button className="admin-danger" onClick={() => onRemoveSkillGroup(groupIndex)} type="button">
-                        Remove Group
-                      </button>
-                    </div>
-                    {group.items.map((item, itemIndex) => (
-                      <div className="admin-grid-two" key={`${item.name}-${itemIndex}`}>
-                        <input onChange={(event) => onSkillItemChange(groupIndex, itemIndex, "name", event.target.value)} value={item.name} />
-                        <div className="admin-inline">
-                          <input onChange={(event) => onSkillItemChange(groupIndex, itemIndex, "value", event.target.value)} value={item.value} />
-                          <button className="admin-danger" onClick={() => onRemoveSkillItem(groupIndex, itemIndex)} type="button">
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                    <button className="admin-add" onClick={() => onAddSkillItem(groupIndex)} type="button">
-                      Add Skill
-                    </button>
-                  </div>
-                ))}
-                <button className="admin-add" onClick={onAddSkillGroup} type="button">
-                  Add Skill Group
-                </button>
-              </div>
-            ) : null}
-
-            {activeAdminTab === "projects" ? (
-              <ArrayEditor
-                addItem={() =>
-                  onAddArrayItem("projects", {
-                    title: "New Project",
-                    tech: "React, CSS",
-                    desc: "Describe the project here.",
-                    accent: "NP",
-                    href: "https://github.com/omshri-23",
-                    linkLabel: "Open Project",
-                  })
-                }
-                fields={[
-                  ["title", "Title"],
-                  ["tech", "Tech CSV"],
-                  ["desc", "Description", true],
-                  ["accent", "Accent"],
-                  ["href", "Link"],
-                  ["linkLabel", "Link Label"],
-                ]}
-                items={portfolio.projects}
-                onChange={(index, field, value) => onArrayItemChange("projects", index, field, value)}
-                onRemove={(index) => onRemoveArrayItem("projects", index)}
-              />
-            ) : null}
-
-            {activeAdminTab === "photos" ? (
-              <ArrayEditor
-                addItem={() =>
-                  onAddArrayItem("photos", {
-                    category: "nature",
-                    title: "New Photo",
-                    label: "Photo Label",
-                    monogram: "NP",
-                  })
-                }
-                fields={[
-                  ["category", "Category"],
-                  ["title", "Title"],
-                  ["label", "Label"],
-                  ["monogram", "Monogram"],
-                ]}
-                items={portfolio.photos}
-                onChange={(index, field, value) => onArrayItemChange("photos", index, field, value)}
-                onRemove={(index) => onRemoveArrayItem("photos", index)}
-              />
-            ) : null}
-
-            {activeAdminTab === "achievements" ? (
-              <ArrayEditor
-                addItem={() => onAddArrayItem("achievements", { title: "New Achievement", desc: "Achievement description." })}
-                fields={[
-                  ["title", "Title"],
-                  ["desc", "Description", true],
-                ]}
-                items={portfolio.achievements}
-                onChange={(index, field, value) => onArrayItemChange("achievements", index, field, value)}
-                onRemove={(index) => onRemoveArrayItem("achievements", index)}
-              />
-            ) : null}
-
-            {activeAdminTab === "blogs" ? (
-              <ArrayEditor
-                addItem={() =>
-                  onAddArrayItem("blogs", {
-                    type: "New Type",
-                    title: "New Blog",
-                    excerpt: "Write the summary here.",
-                    badge: "NB",
-                  })
-                }
-                fields={[
-                  ["type", "Type"],
-                  ["title", "Title"],
-                  ["excerpt", "Excerpt", true],
-                  ["badge", "Badge"],
-                ]}
-                items={portfolio.blogs}
-                onChange={(index, field, value) => onArrayItemChange("blogs", index, field, value)}
-                onRemove={(index) => onRemoveArrayItem("blogs", index)}
-              />
-            ) : null}
-
-            {activeAdminTab === "socials" ? (
-              <ArrayEditor
-                addItem={() => onAddArrayItem("socials", { label: "New Link", href: "https://example.com" })}
-                fields={[
-                  ["label", "Label"],
-                  ["href", "URL"],
-                ]}
-                items={portfolio.socials}
-                onChange={(index, field, value) => onArrayItemChange("socials", index, field, value)}
-                onRemove={(index) => onRemoveArrayItem("socials", index)}
-              />
-            ) : null}
-
-            {activeAdminTab === "settings" ? (
-              <div className="admin-section">
-                <AdminField label="Contact label" onChange={(value) => onSectionChange("contact", "label", value)} value={portfolio.contact.label} />
-                <AdminField label="Contact title" onChange={(value) => onSectionChange("contact", "title", value)} value={portfolio.contact.title} />
-                <AdminTextArea label="Contact subtitle" onChange={(value) => onSectionChange("contact", "subtitle", value)} value={portfolio.contact.subtitle} />
-                <AdminTextArea label="Form success message" onChange={(value) => onSectionChange("contact", "formMessage", value)} value={portfolio.contact.formMessage} />
-                <AdminField label="Footer left" onChange={(value) => onSectionChange("footer", "left", value)} value={portfolio.footer.left} />
-                <AdminField label="Footer right" onChange={(value) => onSectionChange("footer", "right", value)} value={portfolio.footer.right} />
-                <div className="admin-subhead">Admin password</div>
-                <div className="admin-inline">
-                  <input onChange={(event) => onAdminDraftPasswordChange(event.target.value)} type="password" value={adminDraftPassword} />
-                  <button className="admin-add" onClick={onSavePassword} type="button">
-                    Save Password
-                  </button>
-                </div>
-                <button className="admin-danger admin-reset" onClick={onResetPortfolio} type="button">
-                  Reset Portfolio to Default
-                </button>
-              </div>
-            ) : null}
-          </div>
-        </>
-      )}
-    </aside>
-  );
-}
-
 function App() {
-  const [theme, setTheme] = useState("dark");
-  const [portfolio, setPortfolio] = useState(loadPortfolioData);
-  const [adminPassword, setAdminPassword] = useState(loadPassword);
-  const [adminDraftPassword, setAdminDraftPassword] = useState(loadPassword);
-  const [adminOpen, setAdminOpen] = useState(false);
-  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
-  const [loginInput, setLoginInput] = useState("");
-  const [loginError, setLoginError] = useState("");
-  const [activeAdminTab, setActiveAdminTab] = useState("hero");
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [lightboxItem, setLightboxItem] = useState(null);
-  const [navCompact, setNavCompact] = useState(false);
-  const [cursor, setCursor] = useState({ x: 0, y: 0, grow: false });
-  const [formState, setFormState] = useState({ name: "", email: "", subject: "", message: "" });
-  const [formStatus, setFormStatus] = useState("");
-  const [saveMessage, setSaveMessage] = useState("");
-  const revealRef = useRef(new Set());
+  const sections = useMemo(
+    () => ["hero", "experience", "about", "projects", "journey", "milestones", "contact"],
+    [],
+  );
+  const [activeSection, setActiveSection] = useState("hero");
+  const [heroBadge, setHeroBadge] = useState("BCA Student - Developer - Kolhapur, MH");
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+    document.documentElement.style.background = "#07070d";
+    document.body.style.background = "#07070d";
+    document.body.style.color = "#efe8da";
 
-  useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(portfolio));
-  }, [portfolio]);
-
-  useEffect(() => {
-    window.localStorage.setItem(PASSWORD_KEY, adminPassword);
-  }, [adminPassword]);
-
-  useEffect(() => {
-    const onMove = (event) => {
-      setCursor((current) => ({ ...current, x: event.clientX, y: event.clientY }));
-    };
-    const onScroll = () => setNavCompact(window.scrollY > 60);
-
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("scroll", onScroll);
-    onScroll();
-
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    const nodes = document.querySelectorAll(".reveal");
-    const observer = new IntersectionObserver(
+    const revealTargets = document.querySelectorAll(".reveal");
+    const revealObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in");
+            revealObserver.unobserve(entry.target);
           }
-          if (!revealRef.current.has(entry.target)) {
-            revealRef.current.add(entry.target);
-            entry.target.classList.add("visible");
-          }
-          observer.unobserve(entry.target);
         });
       },
       { threshold: 0.12 },
     );
 
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
-  }, [portfolio, adminOpen, activeAdminTab]);
+    revealTargets.forEach((node) => revealObserver.observe(node));
 
-  useEffect(() => {
-    if (!lightboxItem) {
-      return undefined;
-    }
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.45 },
+    );
 
-    const onKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setLightboxItem(null);
+    sections.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) {
+        sectionObserver.observe(element);
       }
-    };
+    });
 
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKeyDown);
+      revealObserver.disconnect();
+      sectionObserver.disconnect();
     };
-  }, [lightboxItem]);
+  }, [sections]);
 
   useEffect(() => {
-    if (!saveMessage) {
-      return undefined;
-    }
-    const timeout = window.setTimeout(() => setSaveMessage(""), 2400);
-    return () => window.clearTimeout(timeout);
-  }, [saveMessage]);
+    const target = "BCA Student - Developer - Kolhapur, MH";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let frame = 0;
+    const timer = window.setInterval(() => {
+      let next = "";
+      for (let index = 0; index < target.length; index += 1) {
+        if (target[index] === " ") {
+          next += " ";
+        } else if (index < frame / 2) {
+          next += target[index];
+        } else {
+          next += chars[Math.floor(Math.random() * chars.length)];
+        }
+      }
+      setHeroBadge(next);
+      frame += 1;
+      if (frame >= target.length * 2) {
+        window.clearInterval(timer);
+        setHeroBadge(target);
+      }
+    }, 42);
 
-  const filteredPhotos = useMemo(() => {
-    if (activeFilter === "all") {
-      return portfolio.photos;
-    }
-    return portfolio.photos.filter((photo) => photo.category === activeFilter);
-  }, [activeFilter, portfolio.photos]);
+    return () => window.clearInterval(timer);
+  }, []);
 
-  const toggleCursor = (grow) => {
-    setCursor((current) => ({ ...current, grow }));
-  };
-
-  const updateForm = (field, value) => {
-    setFormState((current) => ({ ...current, [field]: value }));
-  };
-
-  const updateSection = (section, field, value) => {
-    setPortfolio((current) => ({
-      ...current,
-      [section]: {
-        ...current[section],
-        [field]: value,
-      },
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const updateArrayItem = (section, index, field, value) => {
-    setPortfolio((current) => ({
-      ...current,
-      [section]: current[section].map((item, itemIndex) =>
-        itemIndex === index ? { ...item, [field]: value } : item,
-      ),
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const addArrayItem = (section, item) => {
-    setPortfolio((current) => ({
-      ...current,
-      [section]: [...current[section], item],
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const removeArrayItem = (section, index) => {
-    setPortfolio((current) => ({
-      ...current,
-      [section]: current[section].filter((_, itemIndex) => itemIndex !== index),
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const updateInterest = (index, value) => {
-    setPortfolio((current) => ({
-      ...current,
-      about: {
-        ...current.about,
-        interests: current.about.interests.map((item, itemIndex) => (itemIndex === index ? value : item)),
-      },
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const addInterest = () => {
-    setPortfolio((current) => ({
-      ...current,
-      about: {
-        ...current.about,
-        interests: [...current.about.interests, "New Interest"],
-      },
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const removeInterest = (index) => {
-    setPortfolio((current) => ({
-      ...current,
-      about: {
-        ...current.about,
-        interests: current.about.interests.filter((_, itemIndex) => itemIndex !== index),
-      },
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const updateSkillGroup = (groupIndex, field, value) => {
-    setPortfolio((current) => ({
-      ...current,
-      skills: current.skills.map((group, index) => (index === groupIndex ? { ...group, [field]: value } : group)),
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const updateSkillItem = (groupIndex, itemIndex, field, value) => {
-    setPortfolio((current) => ({
-      ...current,
-      skills: current.skills.map((group, index) =>
-        index === groupIndex
-          ? {
-              ...group,
-              items: group.items.map((item, skillIndex) =>
-                skillIndex === itemIndex ? { ...item, [field]: field === "value" ? Number(value) || 0 : value } : item,
-              ),
-            }
-          : group,
-      ),
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const addSkillGroup = () => {
-    addArrayItem("skills", { title: "New Skill Group", items: [{ name: "New Skill", value: 50 }] });
-  };
-
-  const removeSkillGroup = (groupIndex) => {
-    removeArrayItem("skills", groupIndex);
-  };
-
-  const addSkillItem = (groupIndex) => {
-    setPortfolio((current) => ({
-      ...current,
-      skills: current.skills.map((group, index) =>
-        index === groupIndex ? { ...group, items: [...group.items, { name: "New Skill", value: 50 }] } : group,
-      ),
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const removeSkillItem = (groupIndex, itemIndex) => {
-    setPortfolio((current) => ({
-      ...current,
-      skills: current.skills.map((group, index) =>
-        index === groupIndex ? { ...group, items: group.items.filter((_, skillIndex) => skillIndex !== itemIndex) } : group,
-      ),
-    }));
-    setSaveMessage("Saved");
-  };
-
-  const handleAdminLogin = () => {
-    if (loginInput === adminPassword) {
-      setAdminLoggedIn(true);
-      setLoginError("");
-      setLoginInput("");
-      return;
-    }
-    setLoginError("Wrong password");
-  };
-
-  const submitForm = (event) => {
-    event.preventDefault();
-    setFormStatus(portfolio.contact.formMessage);
-    setFormState({ name: "", email: "", subject: "", message: "" });
-  };
-
-  const resetPortfolio = () => {
-    setPortfolio(defaultPortfolioData);
-    setAdminDraftPassword("admin123");
-    setAdminPassword("admin123");
-    setSaveMessage("Reset complete");
-  };
-
-  const saveAdminPassword = () => {
-    if (!adminDraftPassword.trim()) {
-      return;
-    }
-    setAdminPassword(adminDraftPassword.trim());
-    setSaveMessage("Password updated");
-  };
+  const currentIndex = Math.max(1, sections.indexOf(activeSection) + 1);
 
   return (
-    <div className="app-shell">
-      <div id="cursor" className={cursor.grow ? "grow" : ""} style={{ left: cursor.x, top: cursor.y }} />
+    <div className="page-shell">
+      <div className="ambient ambient-one" />
+      <div className="ambient ambient-two" />
+      <div className="grain" />
 
-      <button className="admin-toggle" onClick={() => setAdminOpen((current) => !current)} onMouseEnter={() => toggleCursor(true)} onMouseLeave={() => toggleCursor(false)} type="button">
-        {adminOpen ? "Close Admin" : "Admin"}
-      </button>
-
-      <div className={`lightbox ${lightboxItem ? "open" : ""}`} onClick={() => setLightboxItem(null)}>
-        <div className="lightbox-inner" onClick={(event) => event.stopPropagation()}>
-          <p className="lightbox-title">{lightboxItem?.title || "Your photograph will appear here"}</p>
-          <p className="lightbox-label">{lightboxItem?.label || "Click outside to close"}</p>
-        </div>
-        <button className="lightbox-close" onClick={() => setLightboxItem(null)} type="button">
-          X
-        </button>
+      <div className="section-counter" aria-hidden="true">
+        <span className="section-counter__num">{String(currentIndex).padStart(2, "0")}</span>
+        <span className="section-counter__line" />
+        <span className="section-counter__total">/ {String(sections.length).padStart(2, "0")}</span>
       </div>
 
-      <AdminPanel
-        activeAdminTab={activeAdminTab}
-        adminDraftPassword={adminDraftPassword}
-        adminLoggedIn={adminLoggedIn}
-        adminOpen={adminOpen}
-        loginError={loginError}
-        loginInput={loginInput}
-        onAddArrayItem={addArrayItem}
-        onAddInterest={addInterest}
-        onAddSkillGroup={addSkillGroup}
-        onAddSkillItem={addSkillItem}
-        onAdminDraftPasswordChange={setAdminDraftPassword}
-        onArrayItemChange={updateArrayItem}
-        onChangeTab={setActiveAdminTab}
-        onInterestChange={updateInterest}
-        onLogin={handleAdminLogin}
-        onLoginInputChange={setLoginInput}
-        onRemoveArrayItem={removeArrayItem}
-        onRemoveInterest={removeInterest}
-        onRemoveSkillGroup={removeSkillGroup}
-        onRemoveSkillItem={removeSkillItem}
-        onResetPortfolio={resetPortfolio}
-        onSavePassword={saveAdminPassword}
-        onSectionChange={updateSection}
-        onSkillGroupChange={updateSkillGroup}
-        onSkillItemChange={updateSkillItem}
-        portfolio={portfolio}
-        saveMessage={saveMessage}
-      />
-
-      <nav id="navbar" style={{ padding: navCompact ? ".75rem 4rem" : "1.25rem 4rem" }}>
-        <div className="nav-logo">OS.</div>
-        <ul className="nav-links">
-          {navItems.map(([id, label]) => (
-            <li key={id}>
-              <a href={`#${id}`}>{label}</a>
-            </li>
-          ))}
-        </ul>
-        <div className="nav-right">
-          <button className="theme-btn" onClick={() => setTheme((current) => (current === "dark" ? "light" : "dark"))} onMouseEnter={() => toggleCursor(true)} onMouseLeave={() => toggleCursor(false)} title="Toggle theme" type="button">
-            {theme === "dark" ? "Light" : "Dark"}
-          </button>
+      <header className="site-nav">
+        <div className="site-nav__inner">
+          <a href="#hero" className="site-logo">
+            23
+          </a>
+          <nav className="site-links">
+            {navigation.map((item) => (
+              <a key={item.id} href={`#${item.id}`}>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+          <a href="#contact" className="site-pill">
+            Open to Work
+          </a>
         </div>
-      </nav>
+      </header>
 
-      <section id="home">
-        <div className="hero-bg" />
-        <div className="hero-grid-lines" />
-        <div className="hero-left reveal">
-          <div className="hero-label">{portfolio.hero.label}</div>
-          <h1 className="hero-name">
-            {portfolio.hero.firstName}
-            <br />
-            <em>{portfolio.hero.lastName}</em>
-          </h1>
-          <div className="hero-roles">{portfolio.hero.roles}</div>
-          <p className="hero-intro">{portfolio.hero.intro}</p>
-          <div className="hero-btns">
-            <HoverLink href={portfolio.hero.primaryHref} onEnter={() => toggleCursor(true)} onLeave={() => toggleCursor(false)} variant="primary">
-              {portfolio.hero.primaryLabel}
-            </HoverLink>
-            <HoverLink href={portfolio.hero.secondaryHref} onEnter={() => toggleCursor(true)} onLeave={() => toggleCursor(false)} variant="outline">
-              {portfolio.hero.secondaryLabel}
-            </HoverLink>
-          </div>
-        </div>
-        <div className="hero-right reveal">
-          <div className="hero-photo-frame">
-            <div className="hero-photo-bg">
-              <div className="hero-photo-placeholder">
-                <div className="icon">{portfolio.hero.photoMonogram}</div>
-                <p>{portfolio.hero.photoCaption}</p>
+      <main>
+        <section className="hero-section" id="hero">
+          <div className="container hero-grid">
+            <div className="hero-copy">
+              <p className="hero-badge reveal">{heroBadge}</p>
+              <h1 className="hero-title reveal reveal-delay-1">
+                Omshri <span>Singh</span>
+              </h1>
+              <div className="hero-role-row reveal reveal-delay-2">
+                <span>Full Stack Dev</span>
+                <span>Photography-Tech</span>
+                <span>Digital Strategy</span>
+                <span>Creator</span>
+              </div>
+              <p className="hero-text reveal reveal-delay-2">
+                Motivated and self-driven Bachelor of Computer Applications student with 11 months of
+                professional experience in digital marketing and strong hands-on development work
+                across HTML, CSS, JavaScript, ASP.NET, C#, and SQL Server.
+              </p>
+              <div className="hero-actions reveal reveal-delay-3">
+                <MagneticLink href="#projects" className="button button-primary">
+                  View Projects
+                </MagneticLink>
+                <MagneticLink href="#contact" className="button button-secondary">
+                  Contact Me
+                </MagneticLink>
               </div>
             </div>
-            <div className="hero-photo-deco" />
-            <div className="hero-stat-chips">
-              <div className="stat-chip">
-                <strong>{portfolio.hero.statOneValue}</strong>
-                <span>{portfolio.hero.statOneLabel}</span>
-              </div>
-              <div className="stat-chip">
-                <strong>{portfolio.hero.statTwoValue}</strong>
-                <span>{portfolio.hero.statTwoLabel}</span>
-              </div>
+
+            <div className="hero-stage reveal reveal-delay-2">
+              <div className="hero-ring hero-ring--one" />
+              <div className="hero-ring hero-ring--two" />
+              <div className="hero-ring hero-ring--three" />
+              <div className="hero-orb" />
+              <TiltCard className="floating-card floating-card--main">
+                <div className="floating-card__eyebrow">Focus</div>
+                <div className="floating-card__title">Photography-Tech Startup Vision</div>
+                <p>Building products where creative work and software meet.</p>
+              </TiltCard>
+              <TiltCard className="floating-card floating-card--small floating-card--top">
+                <div className="stat-value">8.67</div>
+                <div className="stat-label">BCA CGPA</div>
+              </TiltCard>
+              <TiltCard className="floating-card floating-card--small floating-card--bottom">
+                <div className="stat-value">11M</div>
+                <div className="stat-label">Social Media Manager</div>
+              </TiltCard>
             </div>
           </div>
-        </div>
-        <div className="scroll-hint">
-          <span>Scroll</span>
-          <div className="scroll-line" />
-        </div>
-      </section>
 
-      <div className="divider" />
-
-      <section id="about">
-        <div className="about-grid">
-          <div className="about-img-frame reveal">
-            <div className="placeholder-icon">{portfolio.about.imageText}</div>
+          <div className="container hero-stats reveal reveal-delay-4">
+            {heroStats.map((item) => (
+              <TiltCard key={item.label} className="hero-stat">
+                <div className="hero-stat__value">{item.value}</div>
+                <div className="hero-stat__label">{item.label}</div>
+              </TiltCard>
+            ))}
           </div>
-          <div className="about-content reveal">
-            <div className="section-label">{portfolio.about.label}</div>
-            <h2 className="section-title">
-              {portfolio.about.title}
-              <br />
-              <em>{portfolio.about.accent}</em>
+        </section>
+
+        <section className="marquee-bar" aria-hidden="true">
+          <div className="marquee-track">
+            {[
+              "ASP.NET",
+              "C#",
+              "React",
+              "SQL Server",
+              "Photography",
+              "Lightroom",
+              "Digital Marketing",
+              "Problem Solving",
+              "Kolhapur",
+              "Basketball",
+              "Cricket",
+            ]
+              .concat([
+                "ASP.NET",
+                "C#",
+                "React",
+                "SQL Server",
+                "Photography",
+                "Lightroom",
+                "Digital Marketing",
+                "Problem Solving",
+                "Kolhapur",
+                "Basketball",
+                "Cricket",
+              ])
+              .map((item, index) => (
+                <span key={`${item}-${index}`}>{item}</span>
+              ))}
+          </div>
+        </section>
+
+        <section className="section section-dark" id="experience">
+          <div className="container">
+            <p className="section-eye reveal">Experience</p>
+            <h2 className="section-title reveal reveal-delay-1">
+              Real-world <span>impact</span>
             </h2>
-            <p className="about-tagline">{portfolio.about.tagline}</p>
-            <p className="about-text">{portfolio.about.paragraphOne}</p>
-            <p className="about-text about-tight">{portfolio.about.paragraphTwo}</p>
-            <div className="interest-tags">
-              {portfolio.about.interests.map((item) => (
-                <span className="tag" key={item}>
-                  {item}
-                </span>
+            <p className="section-subtitle reveal reveal-delay-2">
+              Experience before graduation across branding, digital execution, UI thinking, and
+              platform support.
+            </p>
+
+            <div className="cards-grid cards-grid--two">
+              {experience.map((item, index) => (
+                <TiltCard key={item.company} className={`panel-card reveal reveal-delay-${index + 2}`}>
+                  <div className="panel-top">
+                    <div>
+                      <h3>{item.company}</h3>
+                      <p className="panel-role">{item.role}</p>
+                    </div>
+                    <span className="panel-period">{item.period}</span>
+                  </div>
+                  <ul className="bullet-list">
+                    {item.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                  <div className="tag-row">
+                    {item.tags.map((tag) => (
+                      <span key={tag} className="tag">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </TiltCard>
               ))}
             </div>
-            <HoverLink href="#contact" onEnter={() => toggleCursor(true)} onLeave={() => toggleCursor(false)} variant="primary">
-              Let's Connect
-            </HoverLink>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <div className="divider" />
+        <section className="section" id="about">
+          <div className="container about-layout">
+            <div className="about-copy">
+              <p className="section-eye reveal">About</p>
+              <h2 className="section-title reveal reveal-delay-1">
+                Developer by logic, <span>creator by instinct</span>
+              </h2>
+              <p className="section-subtitle reveal reveal-delay-2">
+                I combine software thinking, digital communication, photography, and product
+                ambition. My long-term direction is clear: build technology that meaningfully serves
+                creative professionals.
+              </p>
 
-      <section id="skills">
-        <div className="section-label">My Skills</div>
-        <h2 className="section-title">Craft meets code.</h2>
-        <p className="section-sub">Everything below is editable from the admin panel, including skill groups and percentages.</p>
-        <div className="skills-grid">
-          {portfolio.skills.map((group) => (
-            <div className="skill-card reveal" key={group.title} onMouseEnter={() => toggleCursor(true)} onMouseLeave={() => toggleCursor(false)}>
-              <div className="skill-card-title">{group.title}</div>
-              <div className="skill-items">
-                {group.items.map((item) => (
-                  <div className="skill-item" key={`${group.title}-${item.name}`}>
-                    <div className="skill-item-label">
-                      {item.name}
-                      <span>{item.value}%</span>
-                    </div>
-                    <div className="skill-bar">
-                      <div className="skill-bar-fill" style={{ width: `${item.value}%` }} />
+              <div className="facts-grid reveal reveal-delay-3">
+                <div className="fact-card">
+                  <span>Email</span>
+                  <strong>omshri.2311@gmail.com</strong>
+                </div>
+                <div className="fact-card">
+                  <span>Phone</span>
+                  <strong>+91 7387517570</strong>
+                </div>
+                <div className="fact-card">
+                  <span>Languages</span>
+                  <strong>English - Hindi - Marathi</strong>
+                </div>
+                <div className="fact-card">
+                  <span>Extra</span>
+                  <strong>Basketball - Cricket - Mobile Photography</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="skills-column">
+              {skillGroups.map((group, groupIndex) => (
+                <div key={group.title} className={`skills-group reveal reveal-delay-${groupIndex + 2}`}>
+                  <div className="skills-group__title">{group.title}</div>
+                  <div className="skills-list">
+                    {group.items.map(([label, value]) => (
+                      <div key={label} className="skill-row">
+                        <div className="skill-row__top">
+                          <span>{label}</span>
+                          <span>{value}%</span>
+                        </div>
+                        <div className="skill-track">
+                          <div className="skill-fill" style={{ width: `${value}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section section-dark" id="projects">
+          <div className="container">
+            <p className="section-eye reveal">Projects</p>
+            <h2 className="section-title reveal reveal-delay-1">
+              Things I have <span>built</span>
+            </h2>
+            <p className="section-subtitle reveal reveal-delay-2">
+              Practical work rooted in portfolio systems, startup thinking, and interface craft.
+            </p>
+
+            <div className="cards-grid cards-grid--projects">
+              {projects.map((project, index) => (
+                <TiltCard key={project.title} className={`project-card reveal reveal-delay-${index + 2}`}>
+                  <div className="project-visual">
+                    <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
+                    <div className="project-glow" />
+                  </div>
+                  <div className="project-body">
+                    <p className="project-type">{project.type}</p>
+                    <h3>{project.title}</h3>
+                    <p className="project-stack">{project.stack}</p>
+                    <p className="project-text">{project.text}</p>
+                    <a href={project.href} target="_blank" rel="noreferrer" className="project-link">
+                      {project.title === "Photic Photography" ? "Open Live Project" : "Open Repository"}
+                    </a>
+                  </div>
+                </TiltCard>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section" id="journey">
+          <div className="container journey-layout">
+            <div>
+              <p className="section-eye reveal">Journey</p>
+              <h2 className="section-title reveal reveal-delay-1">
+                Growth with <span>direction</span>
+              </h2>
+              <p className="section-subtitle reveal reveal-delay-2">
+                From learning the web to building product ideas and working in real business
+                environments.
+              </p>
+
+              <div className="timeline reveal reveal-delay-3">
+                {journey.map(([year, title, description]) => (
+                  <div key={year + title} className="timeline-item">
+                    <span className="timeline-year">{year}</span>
+                    <div>
+                      <h3>{title}</h3>
+                      <p>{description}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          ))}
-        </div>
-      </section>
 
-      <div className="divider" />
-
-      <section id="projects">
-        <div className="section-label">Projects</div>
-        <h2 className="section-title">Things I've built.</h2>
-        <p className="section-sub">Add, remove, or edit project cards any time from the admin panel.</p>
-        <div className="projects-grid">
-          {portfolio.projects.map((project) => (
-            <article className="project-card reveal" key={project.title} onMouseEnter={() => toggleCursor(true)} onMouseLeave={() => toggleCursor(false)}>
-              <div className="project-img">
-                <span className="project-img-placeholder">{project.accent}</span>
-                <div className="project-img-overlay" />
-              </div>
-              <div className="project-body">
-                <div className="project-tech">
-                  {project.tech.split(",").map((item) => (
-                    <span className="tech-badge" key={`${project.title}-${item.trim()}`}>
-                      {item.trim()}
-                    </span>
-                  ))}
-                </div>
-                <div className="project-title">{project.title}</div>
-                <p className="project-desc">{project.desc}</p>
-                <a className="project-link" href={project.href} rel="noreferrer" target="_blank">
-                  {project.linkLabel}
-                </a>
-              </div>
-            </article>
-          ))}
-          <div className="project-card project-card-empty reveal">
-            <span className="plus-mark">+</span>
-            <p>Add more projects from admin whenever needed</p>
-          </div>
-        </div>
-      </section>
-
-      <div className="divider" />
-
-      <section id="photography">
-        <div className="section-label">Photography</div>
-        <h2 className="section-title">Light is my medium.</h2>
-        <p className="section-sub">Photo cards and categories are fully admin-managed now.</p>
-        <div className="photo-filter-bar">
-          {["all", "nature", "street", "portrait", "edit"].map((filter) => (
-            <button className={`filter-btn ${activeFilter === filter ? "active" : ""}`} key={filter} onClick={() => setActiveFilter(filter)} onMouseEnter={() => toggleCursor(true)} onMouseLeave={() => toggleCursor(false)} type="button">
-              {filter === "all" ? "All" : filter === "edit" ? "Creative Edits" : capitalize(filter)}
-            </button>
-          ))}
-        </div>
-        <div className="photo-masonry" id="photo-grid">
-          {filteredPhotos.map((photo, index) => (
-            <button className="photo-item" key={`${photo.title}-${index}`} onClick={() => setLightboxItem(photo)} onMouseEnter={() => toggleCursor(true)} onMouseLeave={() => toggleCursor(false)} type="button">
-              <div className="photo-item-inner">
-                <div className="photo-placeholder">
-                  <div className="big-icon">{photo.monogram}</div>
-                  <p>{photo.label}</p>
-                </div>
-                <div className="photo-overlay">
-                  <div className="photo-meta">
-                    <span className="photo-category">{photo.category}</span>
-                    <br />
-                    {photo.title}
+            <div className="education-stack">
+              <div className="section-eye reveal">Education</div>
+              {education.map((item, index) => (
+                <TiltCard key={item.title} className={`education-card reveal reveal-delay-${index + 2}`}>
+                  <p className="education-year">{item.year}</p>
+                  <h3>{item.title}</h3>
+                  <p className="education-place">{item.place}</p>
+                  <div className="education-score">
+                    <strong>{item.score}</strong>
+                    <span>{item.label}</span>
                   </div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
+                </TiltCard>
+              ))}
 
-      <div className="divider" />
-
-      <section id="achievements">
-        <div className="section-label">Achievements</div>
-        <h2 className="section-title">Milestones.</h2>
-        <p className="section-sub">Achievement cards can be added and removed from admin.</p>
-        <div className="achievements-grid">
-          {portfolio.achievements.map((item) => (
-            <div className="ach-card reveal" key={item.title} onMouseEnter={() => toggleCursor(true)} onMouseLeave={() => toggleCursor(false)}>
-              <div className="ach-title">{item.title}</div>
-              <p className="ach-desc">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="divider" />
-
-      <section id="blog">
-        <div className="section-label">Writing and Blog</div>
-        <h2 className="section-title">Stories worth telling.</h2>
-        <p className="section-sub">Blog cards are also dynamic now.</p>
-        <div className="blog-grid">
-          {portfolio.blogs.map((item) => (
-            <article className="blog-card reveal" key={item.title} onMouseEnter={() => toggleCursor(true)} onMouseLeave={() => toggleCursor(false)}>
-              <div className="blog-card-top">{item.badge}</div>
-              <div className="blog-body">
-                <div className="blog-type">{item.type}</div>
-                <div className="blog-title">{item.title}</div>
-                <p className="blog-excerpt">{item.excerpt}</p>
-                <span className="blog-read">Read more</span>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <div className="divider" />
-
-      <section id="contact">
-        <div className="section-label section-label-center">{portfolio.contact.label}</div>
-        <h2 className="section-title">{portfolio.contact.title}</h2>
-        <p className="section-sub">{portfolio.contact.subtitle}</p>
-        <div className="contact-card reveal">
-          <form className="contact-form" onSubmit={submitForm}>
-            <div className="form-row">
-              <div className="form-field">
-                <label htmlFor="name">Your Name</label>
-                <input id="name" onChange={(event) => updateForm("name", event.target.value)} placeholder="Your full name" value={formState.name} />
-              </div>
-              <div className="form-field">
-                <label htmlFor="email">Your Email</label>
-                <input id="email" onChange={(event) => updateForm("email", event.target.value)} placeholder="you@example.com" type="email" value={formState.email} />
+              <div className="certifications certifications-grid reveal reveal-delay-4">
+                {certifications.map((item, index) => (
+                  <TiltCard key={item.title} className={`cert-card cert-card--${index + 1}`}>
+                    <p className="cert-card__meta">{item.meta}</p>
+                    <h4>{item.title}</h4>
+                    <p>{item.text}</p>
+                  </TiltCard>
+                ))}
               </div>
             </div>
-            <div className="form-field">
-              <label htmlFor="subject">Subject</label>
-              <input id="subject" onChange={(event) => updateForm("subject", event.target.value)} placeholder="Project collaboration or opportunity" value={formState.subject} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="message">Message</label>
-              <textarea id="message" onChange={(event) => updateForm("message", event.target.value)} placeholder="Tell me about your idea, role, or project" rows="5" value={formState.message} />
-            </div>
-            <button className="btn-primary" type="submit">
-              Send Message
-            </button>
-            {formStatus ? <p className="form-status">{formStatus}</p> : null}
-          </form>
-        </div>
-        <div className="contact-socials">
-          {portfolio.socials.map((item) => (
-            <a className="social-link" href={item.href} key={`${item.label}-${item.href}`} rel={item.href.startsWith("http") ? "noreferrer" : undefined} target={item.href.startsWith("http") ? "_blank" : undefined}>
-              {item.label}
-            </a>
-          ))}
-        </div>
-      </section>
+          </div>
+        </section>
 
-      <footer>
-        <p>{portfolio.footer.left}</p>
-        <p>{portfolio.footer.right}</p>
-      </footer>
+        <section className="section section-dark" id="milestones">
+          <div className="container">
+            <p className="section-eye reveal">Milestones and Wins</p>
+            <h2 className="section-title reveal reveal-delay-1">
+              Milestones and <span>wins</span>
+            </h2>
+            <p className="section-subtitle reveal reveal-delay-2">
+              Sports, academics, creativity, and execution - the strongest highlights from the
+              journey so far.
+            </p>
+
+            <div className="cards-grid cards-grid--milestones">
+              {milestones.map((item, index) => (
+                <TiltCard key={item.title} className={`milestone-card reveal reveal-delay-${index + 1}`}>
+                  <div className="milestone-glow" />
+                  <p className="milestone-label">Highlight</p>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </TiltCard>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="section section-dark" id="contact">
+          <div className="contact-wave" />
+          <div className="contact-mesh" />
+          <div className="container contact-layout">
+            <div>
+              <p className="section-eye reveal">Contact</p>
+              <h2 className="section-title reveal reveal-delay-1">
+                Let us create <span>something</span>
+              </h2>
+              <p className="section-subtitle reveal reveal-delay-2">
+                Open for collaborations, photography projects, and meaningful conversations.
+              </p>
+
+              <div className="contact-links reveal reveal-delay-3 contact-links--icons">
+                <a href="mailto:omshri.2311@gmail.com">omshri.2311@gmail.com</a>
+                <span>India - Available Remotely</span>
+                <span>Responds within 24 hours</span>
+              </div>
+
+              <div className="contact-socials reveal reveal-delay-4">
+                <MagneticLink href="https://www.linkedin.com/in/omshri23/" target="_blank" rel="noreferrer" className="contact-social">
+                  LinkedIn
+                </MagneticLink>
+                <MagneticLink href="https://github.com/omshri-23" target="_blank" rel="noreferrer" className="contact-social">
+                  GitHub
+                </MagneticLink>
+                <MagneticLink href="https://www.instagram.com/photic.photo" target="_blank" rel="noreferrer" className="contact-social">
+                  Instagram
+                </MagneticLink>
+              </div>
+            </div>
+
+            <TiltCard className="contact-panel reveal reveal-delay-4">
+              <div className="contact-panel__mesh" />
+              <p className="contact-panel__label">Current Focus</p>
+              <h3>Startup-ready photography products</h3>
+              <p>
+                LensCraft is the clearest expression of where I want to go next: software that helps
+                photographers present, manage, and grow their work.
+              </p>
+              <div className="contact-panel__buttons">
+                <MagneticLink href="mailto:omshri.2311@gmail.com" className="button button-primary">
+                  Email Me
+                </MagneticLink>
+                <MagneticLink href="https://github.com/omshri-23" target="_blank" rel="noreferrer" className="button button-secondary">
+                  View GitHub
+                </MagneticLink>
+              </div>
+            </TiltCard>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

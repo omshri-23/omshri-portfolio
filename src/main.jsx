@@ -1,53 +1,61 @@
-import { Component, StrictMode } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
-import "./index.css";
 
-class ErrorBoundary extends Component {
+class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, errorMessage: "" };
+    this.state = { hasError: false, message: "" };
   }
 
   static getDerivedStateFromError(error) {
-    return {
-      hasError: true,
-      errorMessage: error?.message || "Unknown render error",
-    };
+    return { hasError: true, message: String(error) };
+  }
+
+  componentDidCatch(error) {
+    console.error(error);
   }
 
   render() {
     if (this.state.hasError) {
-      return (
-        <div
-          style={{
+      return React.createElement(
+        "div",
+        {
+          style: {
             minHeight: "100vh",
-            display: "grid",
-            placeItems: "center",
-            background: "#f5f0e8",
-            color: "#1a1714",
-            padding: "2rem",
-            fontFamily: "Outfit, sans-serif",
-          }}
-        >
-          <div style={{ maxWidth: "720px" }}>
-            <h1 style={{ margin: "0 0 1rem", fontSize: "2rem" }}>Portfolio failed to render</h1>
-            <p style={{ margin: "0 0 0.75rem" }}>
-              The app hit a runtime error. Refresh once. If it still fails, the latest code now ignores old saved data automatically.
-            </p>
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                background: "#ede7db",
-                padding: "1rem",
-                borderRadius: "8px",
-                border: "1px solid rgba(26, 23, 20, 0.1)",
-              }}
-            >
-              {this.state.errorMessage}
-            </pre>
-          </div>
-        </div>
+            background: "#0a0a0f",
+            color: "#f2ede3",
+            fontFamily: "Segoe UI, Arial, sans-serif",
+            padding: "40px 24px",
+          },
+        },
+        React.createElement(
+          "div",
+          { style: { maxWidth: "1100px", margin: "0 auto" } },
+          React.createElement(
+            "p",
+            {
+              style: {
+                margin: 0,
+                color: "#c9a84c",
+                letterSpacing: ".2em",
+                textTransform: "uppercase",
+                fontSize: "12px",
+              },
+            },
+            "Render error",
+          ),
+          React.createElement(
+            "h1",
+            { style: { margin: "16px 0 12px", fontSize: "48px", lineHeight: 1 } },
+            "Omshri Singh",
+          ),
+          React.createElement(
+            "pre",
+            { style: { whiteSpace: "pre-wrap", color: "#c7c0b2" } },
+            this.state.message,
+          ),
+        ),
       );
     }
 
@@ -55,10 +63,28 @@ class ErrorBoundary extends Component {
   }
 }
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </StrictMode>,
-);
+const rootElement = document.getElementById("root");
+
+document.documentElement.style.background = "#0a0a0f";
+document.body.style.margin = "0";
+document.body.style.background = "#0a0a0f";
+document.body.style.color = "#f2ede3";
+document.body.style.fontFamily = "Segoe UI, Arial, sans-serif";
+
+if (rootElement) {
+  rootElement.style.minHeight = "100vh";
+  rootElement.style.background = "#0a0a0f";
+  rootElement.innerHTML = `
+    <div style="min-height:100vh;background:#0a0a0f;color:#f2ede3;font-family:Segoe UI,Arial,sans-serif;padding:40px 24px;">
+      <div style="max-width:1100px;margin:0 auto;">
+        <p style="margin:0;color:#c9a84c;letter-spacing:.2em;text-transform:uppercase;font-size:12px;">Loading portfolio</p>
+        <h1 style="margin:16px 0 12px;font-size:48px;line-height:1;">Omshri Singh</h1>
+        <p style="margin:0;color:#c7c0b2;line-height:1.8;">If React is still loading, this fallback remains visible instead of a blank page.</p>
+      </div>
+    </div>
+  `;
+
+  createRoot(rootElement).render(
+    React.createElement(ErrorBoundary, null, React.createElement(App)),
+  );
+}
