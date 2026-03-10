@@ -71,28 +71,48 @@ const projects = [
     stack: "React - PostgreSQL - Startup Build",
     type: "Photography Startup Platform",
     text: "Originally started as an ASP.NET college project, now being rebuilt as a full startup-focused platform for photographers with stronger product direction, modern frontend architecture, and scalable backend planning.",
-    href: "https://github.com/omshri-23",
+    liveHref: "",
+    repoHref: "https://github.com/omshri-23",
   },
   {
     title: "Photic Photography",
     stack: "React - Vite - Frontend Experience",
     type: "Live Photography Portfolio",
     text: "Live photography portfolio built in React and Vite with a cleaner presentation layer, modern frontend structure, and a visual-first browsing experience.",
-    href: "https://photic-photography.vercel.app/",
+    liveHref: "https://photic-photo.vercel.app/",
+    repoHref: "https://github.com/omshri-23/Photic-Photography",
   },
   {
     title: "Top Byte",
     stack: "HTML - CSS - JavaScript",
     type: "E-commerce Frontend",
     text: "Responsive online computer store interface with product discovery, filtering, and cart-oriented UI behavior.",
-    href: "https://github.com/omshri-23",
+    liveHref: "https://omshri-23.github.io/TopByte/",
+    repoHref: "https://github.com/omshri-23/TopByte",
   },
   {
     title: "Style Sphere",
     stack: "Frontend Concept - UI System",
     type: "Fashion Commerce Interface",
     text: "A visual-first fashion storefront concept focused on bold layout, cleaner browsing flow, and modern product presentation.",
-    href: "https://github.com/omshri-23/Style-Sphere",
+    liveHref: "https://omshri-23.github.io/Style-Sphere/",
+    repoHref: "https://github.com/omshri-23/Style-Sphere",
+  },
+  {
+    title: "Priyadarshini Computers",
+    stack: "Web App - Vercel",
+    type: "Computer Retail Website",
+    text: "A clean, fast website for a local computer store with a modern presentation layer and clear browsing flow.",
+    liveHref: "https://priyadarshini-computers.vercel.app/",
+    repoHref: "https://github.com/omshri-23/priyadarshini-institute",
+  },
+  {
+    title: "EcoTrack",
+    stack: "Carbon Footprint Platform",
+    type: "CarbonFootprint (Public)",
+    text: "EcoTrack is a smart carbon footprint management platform designed to help individuals and organizations measure, analyze, and reduce environmental impact using real-world data and verified emission factors.",
+    liveHref: "https://omshri-23.github.io/CarbonFootprint/",
+    repoHref: "https://github.com/omshri-23/CarbonFootprint",
   },
 ];
 
@@ -162,9 +182,9 @@ const journey = [
     "Built real professional experience by growing a B2B textile portal's social presence, running campaigns, and building content systems.",
   ],
   [
-    "Textile Voice",
-    "Contributor",
-    "Jan - Nov 2025 - Contributed to software development and digital strategy at Textile Voice while working across the same parent company ecosystem.",
+    "Jan - Nov 2025",
+    "Textile Voice - Contributor",
+    "Contributed to software development and digital strategy at Textile Voice while working across the same parent company ecosystem.",
   ],
   [
     "Now",
@@ -204,13 +224,21 @@ const certifications = [
 function TiltCard({ className = "", children }) {
   const onMove = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    const px = (event.clientX - rect.left) / rect.width - 0.5;
-    const py = (event.clientY - rect.top) / rect.height - 0.5;
-    event.currentTarget.style.transform = `perspective(1000px) rotateX(${(-py * 8).toFixed(2)}deg) rotateY(${(px * 10).toFixed(2)}deg) translateY(-6px)`;
+    const x = (event.clientX - rect.left) / rect.width;
+    const y = (event.clientY - rect.top) / rect.height;
+    const px = x - 0.5;
+    const py = y - 0.5;
+    event.currentTarget.style.setProperty("--mx", `${(x * 100).toFixed(2)}%`);
+    event.currentTarget.style.setProperty("--my", `${(y * 100).toFixed(2)}%`);
+    event.currentTarget.style.transform = `perspective(1000px) rotateX(${(-py * 8).toFixed(
+      2,
+    )}deg) rotateY(${(px * 10).toFixed(2)}deg) translateY(-6px)`;
   };
 
   const onLeave = (event) => {
     event.currentTarget.style.transform = "";
+    event.currentTarget.style.removeProperty("--mx");
+    event.currentTarget.style.removeProperty("--my");
   };
 
   return (
@@ -237,6 +265,137 @@ function MagneticLink({ className = "", href, children, ...props }) {
       {children}
     </a>
   );
+}
+
+function InlineIcon({ name, className = "" }) {
+  const common = {
+    className,
+    width: 20,
+    height: 20,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    xmlns: "http://www.w3.org/2000/svg",
+    "aria-hidden": true,
+  };
+
+  switch (name) {
+    case "mail":
+      return (
+        <svg {...common}>
+          <path
+            d="M4.5 7.5l6.8 5.1c.4.3.9.3 1.3 0l6.9-5.1"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M5.5 6.5h13a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "phone":
+      return (
+        <svg {...common}>
+          <path
+            d="M8.2 5.5l1.2-1.2a2 2 0 0 1 2.9 0l1.7 1.7a2 2 0 0 1 0 2.9l-.8.8c1.1 2 2.7 3.7 4.7 4.7l.8-.8a2 2 0 0 1 2.9 0l1.7 1.7a2 2 0 0 1 0 2.9l-1.2 1.2c-1.1 1.1-2.8 1.4-4.2.7-6.4-3.1-11.6-8.3-14.7-14.7-.7-1.4-.4-3.1.7-4.2z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "languages":
+      return (
+        <svg {...common}>
+          <path
+            d="M12 22a10 10 0 1 0-10-10 10 10 0 0 0 10 10z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M2 12h20"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M12 2a14.5 14.5 0 0 1 0 20a14.5 14.5 0 0 1 0-20z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "pin":
+      return (
+        <svg {...common}>
+          <path
+            d="M12 22s7-4.4 7-11a7 7 0 1 0-14 0c0 6.6 7 11 7 11z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M12 11.5a2.2 2.2 0 1 0 0-4.4a2.2 2.2 0 0 0 0 4.4z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "clock":
+      return (
+        <svg {...common}>
+          <path
+            d="M12 22a10 10 0 1 0-10-10a10 10 0 0 0 10 10z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M12 6v6l3.5 2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "spark":
+      return (
+        <svg {...common}>
+          <path
+            d="M12 2l1.1 4a2 2 0 0 0 1.4 1.4l4 1.1-4 1.1a2 2 0 0 0-1.4 1.4l-1.1 4-1.1-4a2 2 0 0 0-1.4-1.4L5.5 8.5l4-1.1A2 2 0 0 0 11 6l1-4z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M19 13l.6 2.1a1.2 1.2 0 0 0 .8.8L22.5 16l-2.1.6a1.2 1.2 0 0 0-.8.8L19 19.5l-.6-2.1a1.2 1.2 0 0 0-.8-.8L15.5 16l2.1-.6a1.2 1.2 0 0 0 .8-.8L19 13z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    default:
+      return null;
+  }
 }
 
 function App() {
@@ -495,23 +654,47 @@ function App() {
                 creative professionals.
               </p>
 
-              <div className="facts-grid reveal reveal-delay-3">
-                <div className="fact-card">
-                  <span>Email</span>
-                  <strong>omshri.2311@gmail.com</strong>
-                </div>
-                <div className="fact-card">
-                  <span>Phone</span>
-                  <strong>+91 7387517570</strong>
-                </div>
-                <div className="fact-card">
-                  <span>Languages</span>
+              <div className="facts-grid">
+                <TiltCard className="fact-card reveal reveal-delay-3">
+                  <div className="fact-card__meta">
+                    <span className="fact-card__icon">
+                      <InlineIcon name="mail" />
+                    </span>
+                    <span className="fact-card__label">Email</span>
+                  </div>
+                  <strong>
+                    <a href="mailto:omshri.2311@gmail.com">omshri.2311@gmail.com</a>
+                  </strong>
+                </TiltCard>
+                <TiltCard className="fact-card reveal reveal-delay-4">
+                  <div className="fact-card__meta">
+                    <span className="fact-card__icon">
+                      <InlineIcon name="phone" />
+                    </span>
+                    <span className="fact-card__label">Phone</span>
+                  </div>
+                  <strong>
+                    <a href="tel:+917387517570">+91 7387517570</a>
+                  </strong>
+                </TiltCard>
+                <TiltCard className="fact-card reveal reveal-delay-3">
+                  <div className="fact-card__meta">
+                    <span className="fact-card__icon">
+                      <InlineIcon name="languages" />
+                    </span>
+                    <span className="fact-card__label">Languages</span>
+                  </div>
                   <strong>English - Hindi - Marathi</strong>
-                </div>
-                <div className="fact-card">
-                  <span>Extra</span>
+                </TiltCard>
+                <TiltCard className="fact-card reveal reveal-delay-4">
+                  <div className="fact-card__meta">
+                    <span className="fact-card__icon">
+                      <InlineIcon name="spark" />
+                    </span>
+                    <span className="fact-card__label">Extra</span>
+                  </div>
                   <strong>Basketball - Cricket - Mobile Photography</strong>
-                </div>
+                </TiltCard>
               </div>
             </div>
 
@@ -551,18 +734,48 @@ function App() {
             <div className="cards-grid cards-grid--projects">
               {projects.map((project, index) => (
                 <TiltCard key={project.title} className={`project-card reveal reveal-delay-${index + 2}`}>
-                  <div className="project-visual">
-                    <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
-                    <div className="project-glow" />
-                  </div>
-                  <div className="project-body">
-                    <p className="project-type">{project.type}</p>
-                    <h3>{project.title}</h3>
-                    <p className="project-stack">{project.stack}</p>
-                    <p className="project-text">{project.text}</p>
-                    <a href={project.href} target="_blank" rel="noreferrer" className="project-link">
-                      {project.title === "Photic Photography" ? "Open Live Project" : "Open Repository"}
-                    </a>
+                  <div className="project-card__inner">
+                    <div className="project-visual">
+                      <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
+                      <div className="project-glow" />
+                    </div>
+                    <div className="project-body">
+                      <p className="project-type">{project.type}</p>
+                      <h3>{project.title}</h3>
+                      <p className="project-stack">{project.stack}</p>
+                      <p className="project-text">{project.text}</p>
+                      <div className="project-links">
+                        {project.liveHref ? (
+                          <MagneticLink
+                            href={project.liveHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="project-action project-action--live"
+                          >
+                            Live
+                          </MagneticLink>
+                        ) : (
+                          <span className="project-action project-action--disabled" aria-disabled="true">
+                            Live
+                          </span>
+                        )}
+
+                        {project.repoHref ? (
+                          <MagneticLink
+                            href={project.repoHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="project-action project-action--repo"
+                          >
+                            GitHub
+                          </MagneticLink>
+                        ) : (
+                          <span className="project-action project-action--disabled" aria-disabled="true">
+                            GitHub
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </TiltCard>
               ))}
@@ -583,15 +796,27 @@ function App() {
               </p>
 
               <div className="timeline reveal reveal-delay-3">
-                {journey.map(([year, title, description]) => (
-                  <div key={year + title} className="timeline-item">
-                    <span className="timeline-year">{year}</span>
-                    <div>
-                      <h3>{title}</h3>
-                      <p>{description}</p>
+                {journey.map(([year, title, description]) => {
+                  const titleParts = String(title).split(" - ");
+                  const metaCandidate = titleParts[titleParts.length - 1] || "";
+                  const showMeta =
+                    titleParts.length > 1 && /%|\bCGPA\b|\bHSC\b|\bSSC\b|\d/.test(metaCandidate);
+                  const mainTitle = showMeta ? titleParts.slice(0, -1).join(" - ") : title;
+                  const metaTitle = showMeta ? metaCandidate : "";
+
+                  return (
+                    <div key={year + title} className="timeline-item">
+                      <span className="timeline-year">{year}</span>
+                      <div>
+                        <h3 className="timeline-title">
+                          <span className="timeline-title__text">{mainTitle}</span>
+                          {metaTitle ? <span className="timeline-title__meta">{metaTitle}</span> : null}
+                        </h3>
+                        <p>{description}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -636,10 +861,12 @@ function App() {
             <div className="cards-grid cards-grid--milestones">
               {milestones.map((item, index) => (
                 <TiltCard key={item.title} className={`milestone-card reveal reveal-delay-${index + 1}`}>
-                  <div className="milestone-glow" />
-                  <p className="milestone-label">Highlight</p>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
+                  <div className="milestone-card__inner">
+                    <div className="milestone-glow" />
+                    <p className="milestone-label">Highlight</p>
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                  </div>
                 </TiltCard>
               ))}
             </div>
@@ -659,10 +886,31 @@ function App() {
                 Open for collaborations, photography projects, and meaningful conversations.
               </p>
 
-              <div className="contact-links reveal reveal-delay-3 contact-links--icons">
-                <a href="mailto:omshri.2311@gmail.com">omshri.2311@gmail.com</a>
-                <span>India - Available Remotely</span>
-                <span>Responds within 24 hours</span>
+              <div className="contact-links reveal reveal-delay-3">
+                <a className="contact-link" href="mailto:omshri.2311@gmail.com">
+                  <span className="contact-link__icon">
+                    <InlineIcon name="mail" />
+                  </span>
+                  <span>omshri.2311@gmail.com</span>
+                </a>
+                <a className="contact-link" href="tel:+917387517570">
+                  <span className="contact-link__icon">
+                    <InlineIcon name="phone" />
+                  </span>
+                  <span>+91 7387517570</span>
+                </a>
+                <div className="contact-link" role="listitem">
+                  <span className="contact-link__icon">
+                    <InlineIcon name="pin" />
+                  </span>
+                  <span>India - Available Remotely</span>
+                </div>
+                <div className="contact-link" role="listitem">
+                  <span className="contact-link__icon">
+                    <InlineIcon name="clock" />
+                  </span>
+                  <span>Responds within 24 hours</span>
+                </div>
               </div>
 
               <div className="contact-socials reveal reveal-delay-4">
