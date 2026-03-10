@@ -73,6 +73,8 @@ const projects = [
     text: "Originally started as an ASP.NET college project, now being rebuilt as a full startup-focused platform for photographers with stronger product direction, modern frontend architecture, and scalable backend planning.",
     liveHref: "",
     repoHref: "https://github.com/omshri-23",
+    poster: "/projects/lenscraft-preview.svg",
+    video: "",
   },
   {
     title: "Photic Photography",
@@ -81,6 +83,8 @@ const projects = [
     text: "Live photography portfolio built in React and Vite with a cleaner presentation layer, modern frontend structure, and a visual-first browsing experience.",
     liveHref: "https://photic-photo.vercel.app/",
     repoHref: "https://github.com/omshri-23/Photic-Photography",
+    poster: "/projects/photic-preview.svg",
+    video: "",
   },
   {
     title: "Top Byte",
@@ -89,6 +93,8 @@ const projects = [
     text: "Responsive online computer store interface with product discovery, filtering, and cart-oriented UI behavior.",
     liveHref: "https://omshri-23.github.io/TopByte/",
     repoHref: "https://github.com/omshri-23/TopByte",
+    poster: "/projects/topbyte-preview.svg",
+    video: "",
   },
   {
     title: "Style Sphere",
@@ -97,6 +103,8 @@ const projects = [
     text: "A visual-first fashion storefront concept focused on bold layout, cleaner browsing flow, and modern product presentation.",
     liveHref: "https://omshri-23.github.io/Style-Sphere/",
     repoHref: "https://github.com/omshri-23/Style-Sphere",
+    poster: "/projects/stylesphere-preview.svg",
+    video: "",
   },
   {
     title: "Priyadarshini Computers",
@@ -105,6 +113,8 @@ const projects = [
     text: "A clean, fast website for a local computer store with a modern presentation layer and clear browsing flow.",
     liveHref: "https://priyadarshini-computers.vercel.app/",
     repoHref: "https://github.com/omshri-23/priyadarshini-institute",
+    poster: "/projects/priyadarshini-preview.svg",
+    video: "",
   },
   {
     title: "EcoTrack",
@@ -113,6 +123,8 @@ const projects = [
     text: "EcoTrack is a smart carbon footprint management platform designed to help individuals and organizations measure, analyze, and reduce environmental impact using real-world data and verified emission factors.",
     liveHref: "https://github.com/omshri-23/CarbonFootprint",
     repoHref: "https://github.com/omshri-23/CarbonFootprint",
+    poster: "/projects/ecotrack-preview.svg",
+    video: "",
   },
 ];
 
@@ -190,7 +202,7 @@ const journey = [
   ],
 ];
 
-const certifications = [
+const designCertifications = [
   {
     title: "Adobe Photoshop",
     meta: "Certified - 2024",
@@ -206,6 +218,9 @@ const certifications = [
     meta: "Design Practice",
     text: "Hierarchy, spacing systems, typography, and user-first interface thinking.",
   },
+];
+
+const coreCertifications = [
   {
     title: "Database Management",
     meta: "Core Knowledge",
@@ -222,20 +237,6 @@ const certifications = [
     text: "System fundamentals, process awareness, and platform-level understanding.",
   },
 ];
-
-function projectMonogram(title) {
-  const parts = String(title)
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-
-  const word = parts[0] ?? "";
-  return word.slice(0, 2).toUpperCase();
-}
 
 function TiltCard({ className = "", children }) {
   const onMove = (event) => {
@@ -305,6 +306,48 @@ function BootLoader({ done }) {
           </div>
         </div>
       </TiltCard>
+    </div>
+  );
+}
+
+function ProjectMedia({ poster, video, alt }) {
+  const [playing, setPlaying] = useState(false);
+  const hasVideo = Boolean(video);
+
+  const onEnter = (event) => {
+    if (!hasVideo) return;
+    const element = event.currentTarget.querySelector("video");
+    if (!element) return;
+    element.currentTime = 0;
+    const result = element.play();
+    if (result && typeof result.catch === "function") {
+      result.catch(() => {});
+    }
+    setPlaying(true);
+  };
+
+  const onLeave = (event) => {
+    if (!hasVideo) return;
+    const element = event.currentTarget.querySelector("video");
+    if (!element) return;
+    element.pause();
+    element.currentTime = 0;
+    setPlaying(false);
+  };
+
+  if (!poster && !hasVideo) return null;
+
+  return (
+    <div
+      className={`project-media${playing ? " project-media--playing" : ""}`}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      aria-hidden="true"
+    >
+      {poster ? <img src={poster} alt={alt ?? ""} loading="lazy" decoding="async" /> : null}
+      {hasVideo ? (
+        <video src={video} muted playsInline loop preload="none" />
+      ) : null}
     </div>
   );
 }
@@ -790,12 +833,14 @@ function App() {
                 <TiltCard key={project.title} className={`project-card reveal reveal-delay-${index + 2}`}>
                   <div className="project-card__inner">
                     <div className="project-visual">
-                      <div className="project-mark" aria-hidden="true">
-                        <span className="project-mark__icon">
-                          <InlineIcon name="spark" className="project-mark__svg" />
-                        </span>
-                        <span className="project-mark__abbr">{projectMonogram(project.title)}</span>
-                      </div>
+                      <ProjectMedia
+                        poster={project.poster}
+                        video={project.video}
+                        alt={`${project.title} preview`}
+                      />
+                      <span className="project-hint" aria-hidden="true">
+                        {project.type}
+                      </span>
                       <span className="project-index">{String(index + 1).padStart(2, "0")}</span>
                       <div className="project-glow" />
                     </div>
@@ -892,13 +937,25 @@ function App() {
               ))}
 
               <div className="certifications certifications-grid reveal reveal-delay-4">
-                {certifications.map((item, index) => (
-                  <TiltCard key={item.title} className={`cert-card cert-card--${index + 1}`}>
-                    <p className="cert-card__meta">{item.meta}</p>
-                    <h4>{item.title}</h4>
-                    <p>{item.text}</p>
-                  </TiltCard>
-                ))}
+                <div className="cert-column" aria-label="Design certifications">
+                  {designCertifications.map((item, index) => (
+                    <TiltCard key={item.title} className={`cert-card cert-card--${index + 1}`}>
+                      <p className="cert-card__meta">{item.meta}</p>
+                      <h4>{item.title}</h4>
+                      <p>{item.text}</p>
+                    </TiltCard>
+                  ))}
+                </div>
+
+                <div className="cert-column" aria-label="Computer science core knowledge">
+                  {coreCertifications.map((item, index) => (
+                    <TiltCard key={item.title} className={`cert-card cert-card--${index + 4}`}>
+                      <p className="cert-card__meta">{item.meta}</p>
+                      <h4>{item.title}</h4>
+                      <p>{item.text}</p>
+                    </TiltCard>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

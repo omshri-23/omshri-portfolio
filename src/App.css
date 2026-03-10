@@ -744,6 +744,11 @@ a {
   margin-top: 1.4rem;
 }
 
+.cert-column {
+  display: grid;
+  gap: 1rem;
+}
+
 .cert-card {
   position: relative;
   overflow: hidden;
@@ -956,12 +961,15 @@ a {
 
 .project-card__inner {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .project-visual {
   position: relative;
   min-height: 180px;
   overflow: hidden;
+  isolation: isolate;
   --project-accent-a: rgba(201, 168, 76, 0.22);
   --project-accent-b: rgba(45, 114, 100, 0.18);
   background:
@@ -971,10 +979,42 @@ a {
     #171722;
 }
 
+.project-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.project-media img,
+.project-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.project-media img {
+  opacity: 0.9;
+  filter: saturate(1.05) contrast(1.05);
+}
+
+.project-media video {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.project-media--playing video {
+  opacity: 1;
+}
+
 .project-visual::before {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 1;
   background:
     repeating-linear-gradient(
       90deg,
@@ -1005,51 +1045,37 @@ a {
   --project-accent-b: rgba(201, 168, 76, 0.14);
 }
 
-.project-mark {
+.project-hint {
   position: absolute;
   left: 18px;
-  bottom: 16px;
+  top: 16px;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 0.75rem;
+  padding: 0.55rem 0.8rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background:
     radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08), transparent 60%),
     rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(18px);
-  box-shadow: 0 16px 30px -22px rgba(0, 0, 0, 0.9);
-}
-
-.project-mark__icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(201, 168, 76, 0.22);
-  background: rgba(201, 168, 76, 0.08);
-  color: var(--gold);
-}
-
-.project-mark__svg {
-  width: 18px;
-  height: 18px;
-}
-
-.project-mark__abbr {
+  color: rgba(239, 232, 218, 0.92);
   font-family: var(--font-mono);
-  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-size: 0.78rem;
-  color: rgba(239, 232, 218, 0.9);
+  box-shadow: 0 16px 30px -22px rgba(0, 0, 0, 0.9);
+  max-width: calc(100% - 180px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .project-index {
   position: absolute;
   right: 18px;
   bottom: 12px;
+  z-index: 2;
   font-size: 4rem;
   line-height: 1;
   color: rgba(255, 255, 255, 0.06);
@@ -1060,6 +1086,7 @@ a {
   position: absolute;
   left: 22px;
   top: 22px;
+  z-index: 2;
   width: 100px;
   height: 100px;
   border-radius: 999px;
@@ -1068,6 +1095,9 @@ a {
 
 .project-body {
   padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .project-stack {
@@ -1076,17 +1106,18 @@ a {
 }
 
 .project-links {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
   gap: 0.9rem;
-  margin-top: 1rem;
+  margin-top: auto;
 }
 
 .project-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   min-height: 42px;
   padding: 0.65rem 1rem;
   border-radius: 999px;
