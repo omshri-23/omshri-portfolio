@@ -4,7 +4,7 @@ A premium, single-page portfolio built with React + Vite. It showcases experienc
 
 ## Live
 
-- Portfolio: `https://omshri-23.github.io/omshri-portfolio/` (update if different)
+- Portfolio: `https://omshri-portfolio-23.vercel.app/
 
 ## Highlights
 
